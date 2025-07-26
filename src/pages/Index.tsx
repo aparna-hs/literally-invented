@@ -1,36 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import GameLevelCard from "@/components/GameLevelCard";
 import LoginForm from "@/components/LoginForm";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 const Index = () => {
   const [showRules, setShowRules] = useState(false);
 
-  const gameLevels = [
-    {
-      level: 1,
-      title: "The Invention Station",
-      description: "Match colleagues with their amazing talents & hobbies",
-      icon: "🎯",
-      isComingSoon: false
-    },
-    {
-      level: 2, 
-      title: "Baby Face Detective",
-      description: "Match baby photos with current colleague photos",
-      icon: "👶",
-      isComingSoon: false
-    },
-    {
-      level: 3,
-      title: "Mystery Challenge", 
-      description: "Top secret challenge awaits...",
-      icon: "❓",
-      isComingSoon: true
-    }
-  ];
 
   return (
     <div 
@@ -88,12 +64,12 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
+        {/* Main Content */}
+        <div className="flex justify-center max-w-2xl mx-auto">
           {/* Login Section */}
           <div className="flex flex-col items-center">
             <div className="mb-6 text-center">
-              <div className="text-4xl mb-2 animate-float">🎮</div>
+              <div className="text-4xl mb-2 animate-float">🕹️</div>
               <h3 className="text-xl font-retro glow-pink mb-2">
                 READY TO PLAY?
               </h3>
@@ -104,19 +80,6 @@ const Index = () => {
             
             <div className="w-full max-w-sm">
               <LoginForm />
-            </div>
-          </div>
-
-          {/* Game Levels Preview */}
-          <div>
-            <h3 className="text-2xl font-retro glow-cyan mb-6 text-center">
-              🕹️ GAME LEVELS
-            </h3>
-            
-            <div className="grid gap-6">
-              {gameLevels.map((level) => (
-                <GameLevelCard key={level.level} {...level} />
-              ))}
             </div>
           </div>
         </div>

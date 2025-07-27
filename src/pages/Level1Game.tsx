@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { saveScore } from "@/lib/scores";
+import { useAuth } from "@/contexts/AuthContext";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 interface Colleague {
@@ -46,6 +48,16 @@ const Level1Game = () => {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
+  const [shuffledInventions, setShuffledInventions] = useState<Invention[]>([]);
+  const [saving, setSaving] = useState(false);
+  
+  const { isAuthenticated } = useAuth();
+
+  // Shuffle inventions on component mount
+  useEffect(() => {
+    const shuffled = [...inventions].sort(() => Math.random() - 0.5);
+    setShuffledInventions(shuffled);
+  }, []);
 
   const handleDragStart = (e: React.DragEvent, inventionId: string) => {
     setDraggedItem(inventionId);
@@ -76,15 +88,38 @@ const Level1Game = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitted(true);
-    setShowResultsModal(true);
-    // Calculate score and show results
+    setSaving(true);
+    
+    // Calculate score - 10 points per correct answer
     const correctMatches = colleagues.filter(colleague => 
       matches[colleague.id] === colleague.invention
     ).length;
     
-    console.log(`Score: ${correctMatches}/${colleagues.length}`);
+    const score = correctMatches * 10;
+    console.log('Level 1 - Correct matches:', correctMatches, 'Score:', score);
+    
+    // Save score to database
+    if (isAuthenticated) {
+      const result = await saveScore(1, score, 1); // Level 1, score, 1 attempt
+      if (!result.success) {
+        console.error('Failed to save score:', result.error);
+      } else {
+        console.log('Score saved successfully');
+      }
+    }
+    
+    setSaving(false);
+    setShowResultsModal(true);
+  };
+
+  const resetGame = () => {
+    const shuffled = [...inventions].sort(() => Math.random() - 0.5);
+    setShuffledInventions(shuffled);
+    setMatches({});
+    setIsSubmitted(false);
+    setShowResultsModal(false);
   };
 
   const getScoreMessage = () => {
@@ -103,12 +138,13 @@ const Level1Game = () => {
 
   const getMatchedInvention = (colleagueId: string) => {
     const inventionId = matches[colleagueId];
-    return inventions.find(inv => inv.id === inventionId);
+    return shuffledInventions.find(inv => inv.id === inventionId);
   };
 
   const isInventionUsed = (inventionId: string) => {
     return Object.values(matches).includes(inventionId);
   };
+
 
   return (
     <div 
@@ -204,7 +240,7 @@ const Level1Game = () => {
           </h3>
           
           <div className="flex flex-wrap gap-2 justify-center max-w-6xl mx-auto">
-            {inventions.map((invention) => (
+            {shuffledInventions.map((invention) => (
               <div
                 key={invention.id}
                 className={`inline-flex items-center gap-2 px-2 py-1 rounded border-2 cursor-grab active:cursor-grabbing transition-all duration-300 select-none ${
@@ -229,7 +265,7 @@ const Level1Game = () => {
         <div className="flex justify-center mt-12 mb-32">
           <Button
             onClick={handleSubmit}
-            disabled={Object.keys(matches).length !== colleagues.length || isSubmitted}
+disabled={Object.keys(matches).length !== colleagues.length}
             size="lg"
             className="font-retro text-xl px-8 py-4 bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-purple hover:to-neon-pink transition-all duration-300 transform hover:scale-105"
           >
@@ -264,9 +300,21 @@ const Level1Game = () => {
                   </p>
                 </div>
                 
-                <p className="font-pixel text-xs text-gray-400 mt-4">
-                  Click ✕ to close and see results below
-                </p>
+                <div className="mt-6 flex gap-4 justify-center">
+                  <Button
+                    onClick={resetGame}
+                    className="font-retro bg-neon-purple hover:bg-neon-pink"
+                  >
+                    🔄 PLAY AGAIN
+                  </Button>
+                  <Button
+                    onClick={() => window.location.href = '/'}
+                    variant="outline"
+                    className="font-retro border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
+                  >
+                    🏠 HOME
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>

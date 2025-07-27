@@ -2,10 +2,27 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import LoginForm from "@/components/LoginForm";
+import Leaderboard from "@/components/Leaderboard";
+import { useAuth } from "@/contexts/AuthContext";
+import { logout } from "@/lib/auth";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 const Index = () => {
   const [showRules, setShowRules] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-retro glow-cyan animate-pulse">
+            ⏳ LOADING GAME...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
 
   return (
@@ -58,46 +75,94 @@ const Index = () => {
               </DialogContent>
             </Dialog>
             
-            <Button variant="retro" size="sm">
-              🏆 HIGH SCORES
+            <Button 
+              variant="retro" 
+              size="sm"
+              onClick={() => setShowLeaderboard(true)}
+            >
+              🏆 LEADERBOARD
             </Button>
           </div>
         </header>
 
         {/* Main Content */}
         <div className="flex justify-center max-w-2xl mx-auto">
-          {/* Login Section */}
-          <div className="flex flex-col items-center">
-            <div className="mb-6 text-center">
-              <div className="text-4xl mb-2 animate-float">🕹️</div>
-              <h3 className="text-xl font-retro glow-pink mb-2">
-                READY TO PLAY?
-              </h3>
-              <p className="font-pixel text-sm text-muted-foreground">
-                Log in to start your colleague discovery journey
-              </p>
+          {!isAuthenticated ? (
+            /* Login Section */
+            <div className="flex flex-col items-center">
+              <div className="mb-6 text-center">
+                <div className="text-4xl mb-2 animate-float">🕹️</div>
+                <h3 className="text-xl font-retro glow-pink mb-2">
+                  READY TO PLAY?
+                </h3>
+                <p className="font-pixel text-sm text-muted-foreground">
+                  Log in to start your colleague discovery journey
+                </p>
+              </div>
+              
+              <div className="w-full max-w-sm">
+                <LoginForm />
+              </div>
             </div>
-            
-            <div className="w-full max-w-sm">
-              <LoginForm />
+          ) : (
+            /* Authenticated User Section */
+            <div className="flex flex-col items-center">
+              <div className="mb-6 text-center">
+                <div className="text-4xl mb-2 animate-float">🕹️</div>
+                <h3 className="text-xl font-retro glow-pink mb-2">
+                  WELCOME BACK, {user?.display_name?.toUpperCase()}!
+                </h3>
+                <p className="font-pixel text-sm text-muted-foreground">
+                  Choose your challenge and prove your team knowledge
+                </p>
+              </div>
+              
+              <div className="w-full max-w-sm space-y-4">
+                <Button 
+                  onClick={() => window.location.href = '/level1'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
+                >
+                  🎯 LEVEL 1: INVENTION STATION
+                </Button>
+                
+                <Button 
+                  onClick={() => window.location.href = '/level2'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-purple hover:to-neon-cyan"
+                >
+                  ⏰ LEVEL 2: TIMELINE CHALLENGE
+                </Button>
+                
+                <Button 
+                  onClick={logout}
+                  variant="outline"
+                  className="w-full font-pixel text-sm py-3 border-neon-red text-neon-red hover:bg-neon-red/20"
+                >
+                  🚪 LOGOUT
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
+
 
         {/* Footer */}
         <footer className="mt-16 text-center">
           <div className="border-t border-neon-cyan/20 pt-8">
             <p className="font-pixel text-sm text-muted-foreground">
-              Powered by <span className="glow-pink">R&R Team</span> 
-              <span className="mx-2">•</span>
-              <span className="text-neon-green">Level Up Your Team Knowledge! 🚀</span>
+              <span className="text-neon-green">Level Up Your SI Team Knowledge! 🚀</span>
             </p>
             <div className="mt-2 text-xs font-pixel text-muted-foreground">
-              © 2024 • Made with 💜 for team building excellence
+              © 2025 • Made with 💜 by <span className="glow-pink">R&R Team</span>
             </div>
           </div>
         </footer>
       </div>
+
+      {/* Leaderboard Modal */}
+      <Leaderboard 
+        isOpen={showLeaderboard} 
+        onClose={() => setShowLeaderboard(false)} 
+      />
     </div>
   );
 };

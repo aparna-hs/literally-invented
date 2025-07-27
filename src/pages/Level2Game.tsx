@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { saveScore } from "@/lib/scores";
+import { useAuth } from "@/contexts/AuthContext";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 interface Colleague {
@@ -70,6 +72,9 @@ const Level2Game = () => {
   const [isGameComplete, setIsGameComplete] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [lastAttemptCorrect, setLastAttemptCorrect] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
+  
+  const { isAuthenticated } = useAuth();
 
   // Shuffle colleagues on component mount
   useEffect(() => {
@@ -121,27 +126,51 @@ const Level2Game = () => {
     setDragOverIndex(null);
   };
 
-  const checkOrder = () => {
+  const checkOrder = async () => {
     const isCorrect = currentOrder.every((colleague, index) => 
       colleague.correctOrder === index + 1
     );
 
-    setAttempts(prev => prev + 1);
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
     setLastAttemptCorrect(isCorrect);
+    setSaving(true);
 
+    let newScore = 0;
     if (isCorrect) {
-      setScore(50);
+      newScore = 50;
+      setScore(newScore);
       setIsGameComplete(true);
-      setShowResultsModal(true);
-    } else if (attempts + 1 >= 3) {
-      setScore(0);
+    } else if (newAttempts >= 3) {
+      newScore = 0;
+      setScore(newScore);
       setIsGameComplete(true);
-      setShowResultsModal(true);
-    } else {
-      // Show feedback for incorrect attempt, but also show modal immediately
-      setShowResultsModal(true);
-      // Don't auto-close anymore
     }
+    
+    console.log('Level 2 - Attempt:', newAttempts, 'Correct:', isCorrect, 'Score:', newScore, 'Game Complete:', isCorrect || newAttempts >= 3);
+    
+    // Always save score when game is complete (correct answer or all attempts used)
+    if (isAuthenticated && (isCorrect || newAttempts >= 3)) {
+      const result = await saveScore(2, newScore, newAttempts);
+      if (!result.success) {
+        console.error('Failed to save score:', result.error);
+      } else {
+        console.log('Score saved successfully to database:', newScore);
+      }
+    }
+    
+    setSaving(false);
+    setShowResultsModal(true);
+  };
+
+  const resetGame = () => {
+    const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
+    setCurrentOrder(shuffled);
+    setAttempts(0);
+    setScore(0);
+    setIsGameComplete(false);
+    setShowResultsModal(false);
+    setLastAttemptCorrect(null);
   };
 
   const getResultMessage = () => {
@@ -268,7 +297,7 @@ const Level2Game = () => {
         <div className="flex justify-center mb-8">
           <Button
             onClick={checkOrder}
-            disabled={isGameComplete || attempts >= 3}
+disabled={false}
             size="lg"
             className="font-retro text-xl px-8 py-4 bg-gradient-to-r from-neon-purple to-neon-cyan hover:from-neon-cyan hover:to-neon-purple transition-all duration-300 transform hover:scale-105"
           >
@@ -325,9 +354,21 @@ const Level2Game = () => {
                     </p>
                   </div>
                   
-                  <p className="font-pixel text-xs text-gray-400 mt-4">
-                    Click ✕ to close
-                  </p>
+                  <div className="mt-6 flex gap-4 justify-center">
+                    <Button
+                      onClick={resetGame}
+                      className="font-retro bg-neon-purple hover:bg-neon-pink"
+                    >
+                      🔄 PLAY AGAIN
+                    </Button>
+                    <Button
+                      onClick={() => window.location.href = '/'}
+                      variant="outline"
+                      className="font-retro border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
+                    >
+                      🏠 HOME
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <>

@@ -165,11 +165,11 @@ const Level1Game = () => {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-retro font-black mb-4 glow-pink animate-pulse-border">
-            🎯 LEVEL 1: KNOW YOUR CREW
+            🔍 LEVEL 1: KNOW YOUR CREW
           </h1>
           
           <p className="text-lg font-pixel glow-purple mb-6">
-            Match each colleague with what they literally invented! 🚀
+            Drag to match who's who based on these clues! 🔍
           </p>
         </header>
 
@@ -177,7 +177,7 @@ const Level1Game = () => {
           {/* Colleagues Section */}
           <div className="space-y-4">
             <h2 className="text-2xl font-retro glow-cyan text-center mb-6">
-              👥 DROP ON TEAM MEMBERS
+              👥 DROP NAMES ON DESCRIPTIONS
             </h2>
             
             {colleagues.map((colleague) => {
@@ -236,7 +236,7 @@ const Level1Game = () => {
         {/* Fixed Inventions Panel - Always Visible */}
         <div className="fixed bottom-0 left-0 right-0 bg-card/95 border-t-2 border-neon-cyan backdrop-blur-sm z-50 p-4">
           <h3 className="text-lg font-retro glow-cyan text-center mb-3">
-            🚀 DRAG THESE INVENTIONS
+            🚀 DRAG THESE NAMES
           </h3>
           
           <div className="flex flex-wrap gap-2 justify-center max-w-6xl mx-auto">

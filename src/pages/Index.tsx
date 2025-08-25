@@ -122,7 +122,7 @@ const Index = () => {
                   onClick={() => window.location.href = '/level1'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
                 >
-                  🎯 LEVEL 1: KNOW YOUR CREW
+                  🔍 LEVEL 1: KNOW YOUR CREW
                 </Button>
                 
                 <Button 

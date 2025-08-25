@@ -165,7 +165,7 @@ const Level1Game = () => {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-retro font-black mb-4 glow-pink animate-pulse-border">
-            🎯 LEVEL 1: THE INVENTION STATION
+            🎯 LEVEL 1: KNOW YOUR CREW
           </h1>
           
           <p className="text-lg font-pixel glow-purple mb-6">

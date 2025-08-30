@@ -7,6 +7,7 @@ export const validateLevel1Answers = async (userAnswers: Record<string, string>)
   correct_matches: number; 
   total_questions: number; 
   perfect_score: boolean; 
+  results?: Record<string, boolean>;
   success: boolean; 
   error?: string 
 }> => {
@@ -36,7 +37,8 @@ export const validateLevel1Answers = async (userAnswers: Record<string, string>)
       score: data.score,
       correct_matches: data.correct_matches,
       total_questions: data.total_questions,
-      perfect_score: data.perfect_score
+      perfect_score: data.perfect_score,
+      results: data.results
     }
 
   } catch (error: any) {

@@ -1,66 +1,80 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { saveScore } from "@/lib/scores";
+import { validateLevel1Answers } from "@/lib/validation";
 import { useAuth } from "@/contexts/AuthContext";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 interface Colleague {
   id: string;
   name: string;
-  invention: string;
 }
 
-interface Invention {
+interface Description {
   id: string;
-  name: string;
+  text: string;
   emoji: string;
 }
 
 const Level1Game = () => {
   const colleagues: Colleague[] = [
-    { id: "1", name: "Aparna", invention: "board-games" },
-    { id: "2", name: "Raiid", invention: "retro-games" },
-    { id: "3", name: "Ana", invention: "dancing" },
-    { id: "4", name: "Harshad", invention: "randr" },
-    { id: "5", name: "Kara", invention: "christmas" },
-    { id: "6", name: "Christian", invention: "weekly-bytes" },
-    { id: "7", name: "Leigh", invention: "lunch-learn" },
-    { id: "8", name: "Emery", invention: "whiteboarding" },
-    { id: "9", name: "Ted", invention: "football" },
-    { id: "10", name: "Miriam", invention: "servicing-innovation" }
+    { id: "1", name: "André" },
+    { id: "2", name: "Arundhati" },
+    { id: "3", name: "Vikrant" },
+    { id: "4", name: "Ana" },
+    { id: "5", name: "Preeti" },
+    { id: "6", name: "Sagar" },
+    { id: "7", name: "Matt" },
+    { id: "8", name: "Dipanjan" },
+    { id: "9", name: "Laura" },
+    { id: "10", name: "Gaurav" },
+    { id: "11", name: "Edward" },
+    { id: "12", name: "Shreeya" },
+    { id: "13", name: "Shereen" },
+    { id: "14", name: "Christopher" },
+    { id: "15", name: "Rishav" },
+    { id: "16", name: "Chhavi" },
+    { id: "17", name: "Taylor" }
   ];
 
-  const inventions: Invention[] = [
-    { id: "board-games", name: "Board Games", emoji: "🎲" },
-    { id: "retro-games", name: "Retro Games", emoji: "🕹️" },
-    { id: "dancing", name: "Dancing", emoji: "💃" },
-    { id: "randr", name: "R&R", emoji: "🎉" },
-    { id: "christmas", name: "Christmas", emoji: "🎄" },
-    { id: "weekly-bytes", name: "Weekly Bytes", emoji: "📰" },
-    { id: "lunch-learn", name: "Lunch & Learn", emoji: "🍽️" },
-    { id: "whiteboarding", name: "White Boarding", emoji: "📝" },
-    { id: "football", name: "Football", emoji: "⚽" },
-    { id: "servicing-innovation", name: "Servicing Innovation", emoji: "💡" }
+  const descriptions: Description[] = [
+    { id: "44", text: "Co-founded a magazine and was a football (soccer) columnist, Manchester United fan", emoji: "⚽" },
+    { id: "57", text: "From the south of France, has studied & worked in Finland, Australia, New Zealand, likes knitting, outdoor sports, live music", emoji: "🇫🇷" },
+    { id: "32", text: "A cricket fan, plays online games", emoji: "🏏" },
+    { id: "42", text: "Loves fashion, dancing, and her cat", emoji: "💃" },
+    { id: "31", text: "Likes hikes, treks, and gardening", emoji: "🥾" },
+    { id: "61", text: "Plays Chess & Table Tennis", emoji: "♟️" },
+    { id: "22", text: "Gamer, graphic design is his passion", emoji: "🎮" },
+    { id: "36", text: "Born & raised in Jamaica, is the youngest of all his siblings, mountain biker, a NY'er who moved to Connecticut, one of the few people in the world to do an actual negative flight", emoji: "🇯🇲" },
+    { id: "73", text: "Analytics queen", emoji: "📊" },
+    { id: "34", text: "Wanted to be a pilot - was in training to become a fighter pilot cadet for the Indian Air Force", emoji: "✈️" },
+    { id: "75", text: "Powerpoint wizard, is a DJ", emoji: "🎧" },
+    { id: "46", text: "From Miami, loves basketball (Go Heat), loves Drake", emoji: "🏀" },
+    { id: "72", text: "Native New Yorker, is a weighlifter, loves film & cooking", emoji: "🏋️" },
+    { id: "56", text: "Ice hockey player, loves live music", emoji: "🏒" },
+    { id: "80", text: "Is really into biohacking, gymnastics & weightlifting, has 2 dogs & 2 cats", emoji: "🤸" },
+    { id: "35", text: "Grew up in different cities of northern india, master skills in pottery", emoji: "🏺" },
+    { id: "77", text: "Bachelors degree in Pyschology and loves going to converts and camping", emoji: "🏕️" }
   ];
 
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showResultsModal, setShowResultsModal] = useState(false);
-  const [shuffledInventions, setShuffledInventions] = useState<Invention[]>([]);
+  const [shuffledNames, setShuffledNames] = useState<Colleague[]>([]);
   const [saving, setSaving] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
   
   const { isAuthenticated } = useAuth();
 
-  // Shuffle inventions on component mount
+  // Shuffle names on component mount
   useEffect(() => {
-    const shuffled = [...inventions].sort(() => Math.random() - 0.5);
-    setShuffledInventions(shuffled);
+    const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
+    setShuffledNames(shuffled);
   }, []);
 
-  const handleDragStart = (e: React.DragEvent, inventionId: string) => {
-    setDraggedItem(inventionId);
+  const handleDragStart = (e: React.DragEvent, nameId: string) => {
+    setDraggedItem(nameId);
     e.dataTransfer.effectAllowed = "move";
   };
 
@@ -69,21 +83,21 @@ const Level1Game = () => {
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (e: React.DragEvent, colleagueId: string) => {
+  const handleDrop = (e: React.DragEvent, descriptionId: string) => {
     e.preventDefault();
     if (draggedItem) {
       setMatches(prev => ({
         ...prev,
-        [colleagueId]: draggedItem
+        [descriptionId]: draggedItem
       }));
       setDraggedItem(null);
     }
   };
 
-  const handleRemoveMatch = (colleagueId: string) => {
+  const handleRemoveMatch = (descriptionId: string) => {
     setMatches(prev => {
       const newMatches = { ...prev };
-      delete newMatches[colleagueId];
+      delete newMatches[descriptionId];
       return newMatches;
     });
   };
@@ -92,57 +106,66 @@ const Level1Game = () => {
     setIsSubmitted(true);
     setSaving(true);
     
-    // Calculate score - 10 points per correct answer
-    const correctMatches = colleagues.filter(colleague => 
-      matches[colleague.id] === colleague.invention
-    ).length;
+    // Transform matches to format expected by database function
+    // matches is currently: { "description_id": "person_id" }
+    // database expects: { "person_id": "description_id" }
+    const transformedMatches: Record<string, string> = {};
+    Object.entries(matches).forEach(([descriptionId, personId]) => {
+      transformedMatches[personId] = descriptionId;
+    });
     
-    const score = correctMatches * 10;
-    console.log('Level 1 - Correct matches:', correctMatches, 'Score:', score);
+    console.log('Original matches:', matches);
+    console.log('Transformed for database:', transformedMatches);
     
-    // Save score to database
-    if (isAuthenticated) {
-      const result = await saveScore(1, score, 1); // Level 1, score, 1 attempt
-      if (!result.success) {
-        console.error('Failed to save score:', result.error);
-      } else {
-        console.log('Score saved successfully');
-      }
+    // Validate answers on server-side (secure)
+    const validationResult = await validateLevel1Answers(transformedMatches);
+    
+    if (!validationResult.success) {
+      console.error('Answer validation failed:', validationResult.error);
+      setSaving(false);
+      return;
     }
+    
+    console.log('Server validation - Correct matches:', validationResult.correct_matches, 'Score:', validationResult.score);
+    console.log('Score automatically saved by database function');
+    
+    // Store validation result for display
+    setValidationResult(validationResult);
     
     setSaving(false);
     setShowResultsModal(true);
   };
 
   const resetGame = () => {
-    const shuffled = [...inventions].sort(() => Math.random() - 0.5);
-    setShuffledInventions(shuffled);
+    const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
+    setShuffledNames(shuffled);
     setMatches({});
     setIsSubmitted(false);
     setShowResultsModal(false);
   };
 
   const getScoreMessage = () => {
-    const correctMatches = colleagues.filter(colleague => 
-      matches[colleague.id] === colleague.invention
-    ).length;
+    if (!validationResult) return "";
+    
+    const correctMatches = validationResult.correct_matches;
+    const total = validationResult.total_questions;
 
-    if (correctMatches === 10) {
+    if (correctMatches === total) {
       return "woah! you do know the team well, you are literally most caffeinated! ☕✨";
-    } else if (correctMatches < 5) {
+    } else if (correctMatches < total / 2) {
       return "aah you should do more coffee chats and visit social-servicing-innovation more often ☕😅";
     } else {
       return "not bad! but there's always room for more coffee chats ☕🤔";
     }
   };
 
-  const getMatchedInvention = (colleagueId: string) => {
-    const inventionId = matches[colleagueId];
-    return shuffledInventions.find(inv => inv.id === inventionId);
+  const getMatchedName = (descriptionId: string) => {
+    const nameId = matches[descriptionId];
+    return colleagues.find(colleague => colleague.id === nameId);
   };
 
-  const isInventionUsed = (inventionId: string) => {
-    return Object.values(matches).includes(inventionId);
+  const isNameUsed = (nameId: string) => {
+    return Object.values(matches).includes(nameId);
   };
 
 
@@ -173,54 +196,46 @@ const Level1Game = () => {
           </p>
         </header>
 
-        <div className="space-y-8 max-w-4xl mx-auto pb-32">
-          {/* Colleagues Section */}
+        <div className="space-y-8 max-w-6xl mx-auto pb-32">
+          {/* Descriptions Section */}
           <div className="space-y-4">
             <h2 className="text-2xl font-retro glow-cyan text-center mb-6">
               👥 DROP NAMES ON DESCRIPTIONS
             </h2>
             
-            {colleagues.map((colleague) => {
-              const matchedInvention = getMatchedInvention(colleague.id);
-              const isCorrect = isSubmitted && matches[colleague.id] === colleague.invention;
-              const isWrong = isSubmitted && matches[colleague.id] && matches[colleague.id] !== colleague.invention;
+            {descriptions.map((description) => {
+              const matchedName = getMatchedName(description.id);
               
               return (
                 <Card 
-                  key={colleague.id}
-                  className={`p-4 bg-card/90 border-2 transition-all duration-300 ${
-                    isSubmitted 
-                      ? isCorrect 
-                        ? 'border-green-500 bg-green-500/20' 
-                        : isWrong 
-                          ? 'border-red-500 bg-red-500/20'
-                          : matches[colleague.id] 
-                            ? 'border-gray-500 bg-gray-500/20'
-                            : 'border-gray-500'
-                      : 'border-neon-cyan hover:border-neon-pink'
-                  }`}
+                  key={description.id}
+                  className="p-4 bg-card/90 border-2 transition-all duration-300 border-neon-cyan hover:border-neon-pink"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-retro text-lg glow-cyan">
-                      {colleague.name}
-                    </span>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">{description.emoji}</span>
+                        <p className="font-pixel text-sm text-gray-300">
+                          {description.text}
+                        </p>
+                      </div>
+                    </div>
                     
                     <div 
-                      className={`w-48 h-12 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-300 ${
-                        matchedInvention 
+                      className={`w-32 h-12 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        matchedName 
                           ? 'border-neon-green bg-neon-green/20' 
                           : 'border-gray-400 hover:border-neon-pink'
                       }`}
                       onDragOver={handleDragOver}
-                      onDrop={(e) => handleDrop(e, colleague.id)}
+                      onDrop={(e) => handleDrop(e, description.id)}
                     >
-                      {matchedInvention ? (
+                      {matchedName ? (
                         <div 
                           className="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform"
-                          onClick={() => !isSubmitted && handleRemoveMatch(colleague.id)}
+                          onClick={() => !isSubmitted && handleRemoveMatch(description.id)}
                         >
-                          <span>{matchedInvention.emoji}</span>
-                          <span className="text-xs font-pixel">{matchedInvention.name}</span>
+                          <span className="text-sm font-retro glow-pink">{matchedName.name}</span>
                         </div>
                       ) : (
                         <span className="text-xs font-pixel text-gray-400">DROP HERE</span>
@@ -233,28 +248,27 @@ const Level1Game = () => {
           </div>
         </div>
 
-        {/* Fixed Inventions Panel - Always Visible */}
+        {/* Fixed Names Panel - Always Visible */}
         <div className="fixed bottom-0 left-0 right-0 bg-card/95 border-t-2 border-neon-cyan backdrop-blur-sm z-50 p-4">
           <h3 className="text-lg font-retro glow-cyan text-center mb-3">
             🚀 DRAG THESE NAMES
           </h3>
           
           <div className="flex flex-wrap gap-2 justify-center max-w-6xl mx-auto">
-            {shuffledInventions.map((invention) => (
+            {shuffledNames.map((colleague) => (
               <div
-                key={invention.id}
-                className={`inline-flex items-center gap-2 px-2 py-1 rounded border-2 cursor-grab active:cursor-grabbing transition-all duration-300 select-none ${
-                  isInventionUsed(invention.id)
+                key={colleague.id}
+                className={`inline-flex items-center gap-2 px-3 py-2 rounded border-2 cursor-grab active:cursor-grabbing transition-all duration-300 select-none ${
+                  isNameUsed(colleague.id)
                     ? 'bg-gray-600/50 border-gray-600 opacity-50 cursor-not-allowed'
                     : 'bg-card border-neon-purple hover:border-neon-pink hover:scale-105'
                 }`}
-                draggable={!isInventionUsed(invention.id) && !isSubmitted}
-                onDragStart={(e) => handleDragStart(e, invention.id)}
+                draggable={!isNameUsed(colleague.id) && !isSubmitted}
+                onDragStart={(e) => handleDragStart(e, colleague.id)}
                 onDragEnd={() => setDraggedItem(null)}
               >
-                <span className="text-sm">{invention.emoji}</span>
-                <span className="font-pixel text-xs glow-purple whitespace-nowrap">
-                  {invention.name}
+                <span className="font-retro text-sm glow-purple whitespace-nowrap">
+                  {colleague.name}
                 </span>
               </div>
             ))}
@@ -265,7 +279,7 @@ const Level1Game = () => {
         <div className="flex justify-center mt-12 mb-32">
           <Button
             onClick={handleSubmit}
-disabled={Object.keys(matches).length !== colleagues.length}
+            disabled={Object.keys(matches).length !== descriptions.length}
             size="lg"
             className="font-retro text-xl px-8 py-4 bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-purple hover:to-neon-pink transition-all duration-300 transform hover:scale-105"
           >
@@ -289,7 +303,7 @@ disabled={Object.keys(matches).length !== colleagues.length}
               
               <div className="text-center">
                 <div className="text-4xl font-retro glow-pink mb-4 animate-bounce">
-                  {colleagues.filter(c => matches[c.id] === c.invention).length} / {colleagues.length}
+                  {validationResult ? `${validationResult.correct_matches} / ${validationResult.total_questions}` : '0 / 10'}
                 </div>
                 <p className="font-pixel text-sm mb-6">Correct Matches</p>
                 
@@ -326,7 +340,7 @@ disabled={Object.keys(matches).length !== colleagues.length}
             <Card className="max-w-lg mx-auto p-6 bg-card/90 border-neon-cyan">
               <h3 className="text-xl font-retro glow-cyan mb-4">MISSION RESULTS</h3>
               <div className="text-3xl font-retro glow-pink mb-4">
-                {colleagues.filter(c => matches[c.id] === c.invention).length} / {colleagues.length}
+                {validationResult ? `${validationResult.correct_matches} / ${validationResult.total_questions}` : '0 / 17'}
               </div>
               <p className="font-pixel text-sm mb-4">Correct Matches</p>
               

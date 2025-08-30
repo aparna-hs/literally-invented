@@ -7,9 +7,9 @@
 - ✅ Level 1: Name-to-description matching game (17 people) - WORKING
 - ✅ Level 2: Timeline ordering game (5 people) - WORKING  
 - ✅ Supabase authentication with custom login system - WORKING
-- ⚠️ Score saving has RLS policy issues but validation works
-- ✅ Leaderboard displays total scores across levels
-- ✅ Server-side answer validation (secure) - WORKING
+- ✅ Server-side answer validation with automatic score saving - WORKING
+- ✅ Leaderboard displays total scores across levels - WORKING
+- ✅ Security: Answers hidden from frontend, validated on server
 - ✅ Deployed on Vercel: https://literally-invented.vercel.app/
 
 ## 🗄️ Database Structure
@@ -47,11 +47,12 @@ game_answers (
 
 ### Database Functions
 ```sql
--- Server-side answer validation + score saving
+-- Server-side answer validation + automatic score saving
 validate_level1_answers(user_answers JSONB, player_user_id INTEGER)
--- Calculates score, saves to database, returns result
 -- Input: {"1": "44", "2": "57", ...} (person_id: description_id)
+-- Process: Validates answers, calculates score, saves to database automatically
 -- Output: {score: 30, correct_matches: 3, total_questions: 17, perfect_score: false}
+-- Security: Answers stored securely in game_answers table, not accessible from frontend
 ```
 
 ## 👥 Team Members (17 people)
@@ -158,12 +159,11 @@ Environment Variables:
 
 ## 🚨 Known Issues
 
-### 1. Score Saving RLS Policy Issue
+### 1. ~~Score Saving RLS Policy Issue~~ ✅ RESOLVED
 - **Problem**: UPDATE operations return 0 rows affected
 - **Cause**: Row Level Security policies blocking JavaScript client
-- **Evidence**: Direct SQL works, JavaScript client fails
-- **Workaround**: Server-side saving in database function
-- **Status**: Being addressed with server-side scoring
+- **Solution**: Implemented server-side scoring in database function
+- **Status**: ✅ FIXED - Scores now saved automatically by database function
 
 ### 2. Security Concerns (Acknowledged)
 - **Client-side auth**: Can be bypassed via localStorage manipulation
@@ -172,12 +172,17 @@ Environment Variables:
 - **Acceptable for**: Internal team use only
 
 ## 🎯 Recent Changes
-- **Updated Level 1 to server-side validation** (security improvement)
-- **Flipped UI**: Descriptions on top, drag names from bottom
-- **Updated names**: 17 real team members instead of 10 test names
-- **Real descriptions**: Detailed fun facts about each team member
-- **Fixed scoring display**: Uses server validation results
-- **Added unique constraint**: Prevents duplicate scores per user/level
+- **✅ Implemented server-side validation with automatic score saving** (major security improvement)
+- **✅ Updated Level 1 name**: "INVENTION STATION" → "KNOW YOUR CREW" 
+- **✅ Updated subtitle**: "Drag to match who's who based on these clues! 🔍"
+- **✅ Changed emoji**: 🎯 → 🔍 for detective theme consistency
+- **✅ Flipped UI structure**: Descriptions fixed on top, drag names from bottom
+- **✅ Updated to 17 real team members** with actual names
+- **✅ Added 17 real descriptions**: Detailed fun facts with emojis  
+- **✅ Removed redundant client-side score saving**: Database function handles everything
+- **✅ Fixed scoring display**: Uses server validation results throughout
+- **✅ Added unique constraint**: Prevents duplicate scores per user/level
+- **✅ Security**: Answers now hidden from frontend inspection
 
 ## 🔧 Development Commands
 ```bash

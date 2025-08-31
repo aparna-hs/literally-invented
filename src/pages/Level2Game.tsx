@@ -175,7 +175,7 @@ const Level2Game = () => {
             <Card className="max-w-2xl w-full p-8 bg-card/95 border-2 border-neon-cyan animate-pulse-border">
               <div className="text-center">
                 <h1 className="text-4xl font-retro font-black mb-4 glow-pink">
-                  🎮 LEVEL ALREADY COMPLETED!
+                  🎮 CHALLENGE COMPLETED!
                 </h1>
                 
                 <div className="text-6xl mb-6 animate-bounce">✅</div>
@@ -191,7 +191,7 @@ const Level2Game = () => {
                 </div>
                 
                 <p className="font-pixel text-lg glow-purple mb-8">
-                  You can only play Level 2 once! Great job completing the timeline challenge! 🚀
+                  You can only play this challenge once! Great job completing the timeline challenge! 🚀
                 </p>
                 
                 <div className="flex gap-4 justify-center">
@@ -227,7 +227,7 @@ const Level2Game = () => {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-retro font-black mb-4 glow-pink animate-pulse-border">
-            ⏰ LEVEL 2: TIMELINE CHALLENGE
+            ⏰ TIMELINE CHALLENGE
           </h1>
           
           <p className="text-lg font-pixel glow-purple mb-6">
@@ -435,7 +435,7 @@ const Level2Game = () => {
                 <div className="text-4xl mb-4">⚠️</div>
                 <h3 className="text-xl font-retro glow-red mb-4">WAIT!</h3>
                 <p className="font-pixel text-sm mb-6">
-                  You have unsaved progress! Until you finish the level and complete all placements, your score won't be saved.
+                  You have unsaved progress! Until you finish the challenge and complete all placements, your score won't be saved.
                 </p>
                 
                 <div className="flex gap-3 justify-center">

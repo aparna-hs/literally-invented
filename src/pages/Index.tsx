@@ -122,14 +122,14 @@ const Index = () => {
                   onClick={() => window.location.href = '/level1'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
                 >
-                  🔍 LEVEL 1: KNOW YOUR CREW
+                  🔍 KNOW YOUR CREW
                 </Button>
                 
                 <Button 
                   onClick={() => window.location.href = '/level2'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-purple hover:to-neon-cyan"
                 >
-                  ⏰ LEVEL 2: TIMELINE CHALLENGE
+                  ⏰ TIMELINE CHALLENGE
                 </Button>
                 
                 <Button 

@@ -230,7 +230,7 @@ const Level1Game = () => {
             <Card className="max-w-2xl w-full p-8 bg-card/95 border-2 border-neon-cyan animate-pulse-border">
               <div className="text-center">
                 <h1 className="text-4xl font-retro font-black mb-4 glow-pink">
-                  🎮 LEVEL ALREADY COMPLETED!
+                  🎮 CHALLENGE COMPLETED!
                 </h1>
                 
                 <div className="text-6xl mb-6 animate-bounce">✅</div>
@@ -246,7 +246,7 @@ const Level1Game = () => {
                 </div>
                 
                 <p className="font-pixel text-lg glow-purple mb-8">
-                  You can only play Level 1 once! But don't worry - there are more levels to explore! 🚀
+                  You can only play this challenge once! But don't worry - there are more challenges to explore! 🚀
                 </p>
                 
                 <div className="flex gap-4 justify-center">
@@ -254,7 +254,7 @@ const Level1Game = () => {
                     onClick={() => window.location.href = '/level2'}
                     className="font-retro px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
                   >
-                    ⏰ TRY LEVEL 2
+                    ⏰ TIMELINE CHALLENGE
                   </Button>
                   <Button
                     onClick={() => window.location.href = '/'}
@@ -291,7 +291,7 @@ const Level1Game = () => {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-4xl md:text-6xl font-retro font-black mb-4 glow-pink animate-pulse-border">
-            🔍 LEVEL 1: KNOW YOUR CREW
+            🔍 KNOW YOUR CREW
           </h1>
           
           <p className="text-lg font-pixel glow-purple mb-6">
@@ -477,7 +477,7 @@ const Level1Game = () => {
                     onClick={() => window.location.href = '/level2'}
                     className="font-retro bg-neon-purple hover:bg-neon-pink"
                   >
-                    ⏰ LEVEL 2
+                    ⏰ TIMELINE CHALLENGE
                   </Button>
                   <Button
                     onClick={() => window.location.href = '/'}
@@ -524,7 +524,7 @@ const Level1Game = () => {
                 <div className="text-4xl mb-4">⚠️</div>
                 <h3 className="text-xl font-retro glow-red mb-4">WAIT!</h3>
                 <p className="font-pixel text-sm mb-6">
-                  You have unsaved progress! Until you finish the level and submit your answers, your score won't be saved.
+                  You have unsaved progress! Until you finish the challenge and submit your answers, your score won't be saved.
                 </p>
                 
                 <div className="flex gap-3 justify-center">

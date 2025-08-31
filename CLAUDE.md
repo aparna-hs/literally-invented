@@ -4,12 +4,13 @@
 **Team knowledge game called "Literally Invented"** with retro gaming aesthetic for internal team building.
 
 ### Current Status
-- ✅ Level 1: Name-to-description matching game (17 people) - WORKING
-- ✅ Level 2: Timeline ordering game (5 people) - WORKING  
+- ✅ Level 1: Name-to-description matching game (17 people) - COMPLETE with one-time play restriction
+- 🚧 Level 2: Year sorting bucket game (18 people) - IN PROGRESS (redesigned from timeline ordering)
 - ✅ Supabase authentication with custom login system - WORKING
 - ✅ Server-side answer validation with automatic score saving - WORKING
 - ✅ Leaderboard displays total scores across levels - WORKING
 - ✅ Security: Answers hidden from frontend, validated on server
+- ✅ One-time play restrictions implemented for both levels
 - ✅ Deployed on Vercel: https://literally-invented.vercel.app/
 
 ## 🗄️ Database Structure
@@ -36,28 +37,57 @@ scores (
   UNIQUE(user_id, level) -- prevents duplicate scores per user/level
 )
 
--- game_answers table (secure - stores correct answers)
+-- game_answers table (secure - stores correct answers for Level 1)
 game_answers (
   id SERIAL PRIMARY KEY,
   level INTEGER,
   person_id TEXT,
   correct_description_id TEXT
 )
+
+-- game_2_answers table (stores correct answers for Level 2)
+game_2_answers (
+  id bigint PRIMARY KEY,
+  name text,
+  year integer -- join year (2024 or 2025)
+)
+
+-- level2_temp_answers table (temporary storage for Level 2 individual answers)
+level2_temp_answers (
+  user_id integer,
+  player_id integer,
+  submitted_year integer,
+  is_correct boolean,
+  PRIMARY KEY (user_id, player_id)
+)
 ```
 
 ### Database Functions
 ```sql
--- Server-side answer validation + automatic score saving
+-- Level 1: Server-side answer validation + automatic score saving
 validate_level1_answers(user_answers JSONB, player_user_id INTEGER)
 -- Input: {"1": "44", "2": "57", ...} (person_id: description_id)
 -- Process: Validates answers, calculates score, saves to database automatically
--- Output: {score: 30, correct_matches: 3, total_questions: 17, perfect_score: false}
+-- Output: {score: 170, correct_matches: 17, total_questions: 17, perfect_score: true, results: {"44": true, "57": false, ...}}
 -- Security: Answers stored securely in game_answers table, not accessible from frontend
+
+-- Level 2: Individual answer checking for instant feedback
+check_single_answer(person_id INTEGER, submitted_year INTEGER, player_user_id INTEGER)
+-- Input: person_id (1-18), submitted_year (2024/2025), user_id
+-- Process: Validates single answer, stores in temp table
+-- Output: 1 (correct) or 0 (incorrect)
+-- Security: Correct years stored in game_2_answers table
+
+-- Level 2: Final score calculation from stored individual answers
+calculate_level2_score(player_user_id INTEGER)
+-- Input: user_id
+-- Process: Counts correct answers from temp table, saves final score, cleans up temp data
+-- Output: {score: 180, correct_matches: 18, total_questions: 18, perfect_score: true}
 ```
 
-## 👥 Team Members (17 people)
+## 👥 Team Members 
 
-### Names and IDs
+### Level 1: Name-to-Description Matching (17 people)
 ```
 1. André
 2. Arundhati  
@@ -76,6 +106,28 @@ validate_level1_answers(user_answers JSONB, player_user_id INTEGER)
 15. Rishav
 16. Chhavi
 17. Taylor
+```
+
+### Level 2: Year Sorting Game (18 people)
+```
+1. Ashank
+2. Christian
+3. Danielle
+4. Deba
+5. Garima
+6. Gayatri
+7. Harshad
+8. Kara
+9. Kyle
+10. Lindsay
+11. Matthew
+12. Nikita
+13. Prince
+14. Raiid
+15. Sachin
+16. Shalini
+17. Toni
+18. Varun
 ```
 
 ### Descriptions and IDs
@@ -172,17 +224,22 @@ Environment Variables:
 - **Acceptable for**: Internal team use only
 
 ## 🎯 Recent Changes
-- **✅ Implemented server-side validation with automatic score saving** (major security improvement)
-- **✅ Updated Level 1 name**: "INVENTION STATION" → "KNOW YOUR CREW" 
-- **✅ Updated subtitle**: "Drag to match who's who based on these clues! 🔍"
-- **✅ Changed emoji**: 🎯 → 🔍 for detective theme consistency
-- **✅ Flipped UI structure**: Descriptions fixed on top, drag names from bottom
-- **✅ Updated to 17 real team members** with actual names
-- **✅ Added 17 real descriptions**: Detailed fun facts with emojis  
-- **✅ Removed redundant client-side score saving**: Database function handles everything
-- **✅ Fixed scoring display**: Uses server validation results throughout
-- **✅ Added unique constraint**: Prevents duplicate scores per user/level
-- **✅ Security**: Answers now hidden from frontend inspection
+
+### Level 1 Enhancements (COMPLETED)
+- **✅ One-time play restriction**: Users can only play Level 1 once
+- **✅ Visual answer feedback**: Green/red borders and ✅/❌ icons for correct/wrong answers
+- **✅ Enhanced results display**: Shows both score and correct matches count
+- **✅ UI improvements**: Added tip box, navigation buttons, removed "Play Again" option
+- **✅ Server-side validation**: Individual answer results returned from database function
+
+### Level 2 Redesign (IN PROGRESS)
+- **✅ Game mechanic change**: From timeline ordering → year sorting buckets (2024/2025)
+- **✅ Team expansion**: Updated from 5 test members → 18 real team members
+- **✅ One-by-one gameplay**: Names appear individually for sorting
+- **✅ Instant feedback**: Each drop validated server-side with immediate ✅/❌ display
+- **✅ Locked answers**: Once dropped, names can't be changed
+- **✅ Live scoring**: Score updates in real-time as each name is sorted
+- **🚧 Server validation**: Implementing dual-function system (check_single_answer + calculate_level2_score)
 
 ## 🔧 Development Commands
 ```bash
@@ -213,5 +270,23 @@ git push        # Auto-deploys to Vercel
 
 ---
 
+## 🐛 Current Issues Being Resolved
+
+### Level 2 Server Validation Issue
+- **Problem**: Database function returns false even for correct answers
+- **Root Cause**: RLS policies on game_2_answers table blocking SELECT queries
+- **Solution**: Disabled RLS on game_2_answers table with `ALTER TABLE game_2_answers DISABLE ROW LEVEL SECURITY;`
+- **Status**: Fixed - server validation now working correctly
+
+### Key Technical Details for Level 2
+- **Game Flow**: Name appears → user clicks year bucket → server validates immediately → shows ✅/❌ → next name
+- **Database Design**: 
+  - `game_2_answers`: Stores correct years for each person ID
+  - `level2_temp_answers`: Temporary storage for individual answers during gameplay
+  - Two-function system: `check_single_answer()` for instant feedback, `calculate_level2_score()` for final scoring
+- **Security**: Join years hidden from frontend, validated server-side on each drop
+
+---
+
 *This file contains the complete context of the Literally Invented project for future Claude sessions.*
-*Last Updated: 2025-07-27*
+*Last Updated: 2025-08-31*

@@ -99,6 +99,9 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			gridTemplateColumns: {
+				'13': 'repeat(13, minmax(0, 1fr))'
 			}
 		}
 	},

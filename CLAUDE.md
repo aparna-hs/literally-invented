@@ -4,13 +4,15 @@
 **Team knowledge game called "Literally Invented"** with retro gaming aesthetic for internal team building.
 
 ### Current Status
-- ✅ Level 1: Name-to-description matching game (17 people) - COMPLETE with one-time play restriction
-- 🚧 Level 2: Year sorting bucket game (18 people) - IN PROGRESS (redesigned from timeline ordering)
+- ✅ **KNOW YOUR CREW**: Name-to-description matching game (17 people) - COMPLETE with server validation, one-time play, custom exit warnings
+- ✅ **TIMELINE CHALLENGE**: Year sorting bucket game (18 people) - COMPLETE with server validation, one-time play, custom exit warnings  
+- 🚧 **CROSSWORD CHALLENGE**: Interactive crossword puzzle (9 words) - UI/UX COMPLETE, server integration pending
 - ✅ Supabase authentication with custom login system - WORKING
 - ✅ Server-side answer validation with automatic score saving - WORKING
 - ✅ Leaderboard displays total scores across levels - WORKING
 - ✅ Security: Answers hidden from frontend, validated on server
-- ✅ One-time play restrictions implemented for both levels
+- ✅ One-time play restrictions implemented for all challenges
+- ✅ Custom exit warnings replacing browser defaults
 - ✅ Deployed on Vercel: https://literally-invented.vercel.app/
 
 ## 🗄️ Database Structure
@@ -60,6 +62,24 @@ level2_temp_answers (
   is_correct boolean,
   PRIMARY KEY (user_id, player_id)
 )
+
+-- crossword_progress table (Level 3 - PENDING IMPLEMENTATION)
+crossword_progress (
+  user_id integer,
+  answers JSONB, -- {"1-across": "DANA", "2-down": "ANKUR", ...}
+  score integer,
+  completed_words integer,
+  updated_at timestamp,
+  PRIMARY KEY (user_id)
+)
+
+-- crossword_answers table (Level 3 - PENDING IMPLEMENTATION) 
+crossword_answers (
+  clue_number integer,
+  direction text, -- 'across' or 'down'
+  correct_answer text,
+  PRIMARY KEY (clue_number, direction)
+)
 ```
 
 ### Database Functions
@@ -83,6 +103,10 @@ calculate_level2_score(player_user_id INTEGER)
 -- Input: user_id
 -- Process: Counts correct answers from temp table, saves final score, cleans up temp data
 -- Output: {score: 180, correct_matches: 18, total_questions: 18, perfect_score: true}
+
+-- Level 3: Crossword validation functions (PENDING IMPLEMENTATION)
+-- validate_crossword_answers(user_answers JSONB, player_user_id INTEGER)
+-- auto_save_crossword_progress(user_id INTEGER, answers JSONB, score INTEGER)
 ```
 
 ## 👥 Team Members 
@@ -157,9 +181,10 @@ calculate_level2_score(player_user_id INTEGER)
 ```
 src/
 ├── pages/
-│   ├── Index.tsx - Home page with login/game selection
-│   ├── Level1Game.tsx - Name-to-description matching (main game)
-│   └── Level2Game.tsx - Timeline ordering game
+│   ├── Index.tsx - Home page with 3 challenges, no numbered levels
+│   ├── Level1Game.tsx - KNOW YOUR CREW (name-to-description matching)
+│   ├── Level2Game.tsx - TIMELINE CHALLENGE (year sorting buckets)
+│   └── Level3Game.tsx - CROSSWORD CHALLENGE (interactive crossword)
 ├── components/
 │   ├── LoginForm.tsx - Custom authentication form
 │   └── Leaderboard.tsx - Shows total scores across levels
@@ -186,9 +211,10 @@ interface Description { id: string; text: string; emoji: string; }
 ```
 
 ### Scoring System
-- **Level 1**: 10 points per correct match (max 170 points)
-- **Level 2**: 50 points for perfect timeline (max 50 points)
-- **Leaderboard**: Sum of best scores across all levels per user
+- **KNOW YOUR CREW**: 10 points per correct match (max 170 points)
+- **TIMELINE CHALLENGE**: 10 points per correct year placement (max 180 points)  
+- **CROSSWORD CHALLENGE**: 10 points per correct word (max 120 points) - frontend only, server integration pending
+- **Leaderboard**: Sum of best scores across all challenges per user
 - **Server validation**: Answers checked securely, scores saved automatically
 
 ## 🔐 Authentication System
@@ -225,21 +251,59 @@ Environment Variables:
 
 ## 🎯 Recent Changes
 
-### Level 1 Enhancements (COMPLETED)
-- **✅ One-time play restriction**: Users can only play Level 1 once
+### UI/UX Improvements (COMPLETED)
+- **✅ Removed level numbers**: Changed from "LEVEL 1/2" to standalone challenge names for flexible play order
+- **✅ Custom exit warnings**: Replaced browser beforeunload with styled retro-themed modals
+- **✅ Consistent messaging**: Updated "only play this level once" to "only play this challenge once"
+
+### KNOW YOUR CREW (COMPLETED)
+- **✅ One-time play restriction**: Users can only play challenge once
 - **✅ Visual answer feedback**: Green/red borders and ✅/❌ icons for correct/wrong answers
 - **✅ Enhanced results display**: Shows both score and correct matches count
-- **✅ UI improvements**: Added tip box, navigation buttons, removed "Play Again" option
+- **✅ UI improvements**: Added tip box, navigation buttons, custom exit warnings
 - **✅ Server-side validation**: Individual answer results returned from database function
 
-### Level 2 Redesign (IN PROGRESS)
+### TIMELINE CHALLENGE (COMPLETED)
 - **✅ Game mechanic change**: From timeline ordering → year sorting buckets (2024/2025)
 - **✅ Team expansion**: Updated from 5 test members → 18 real team members
 - **✅ One-by-one gameplay**: Names appear individually for sorting
 - **✅ Instant feedback**: Each drop validated server-side with immediate ✅/❌ display
 - **✅ Locked answers**: Once dropped, names can't be changed
 - **✅ Live scoring**: Score updates in real-time as each name is sorted
-- **🚧 Server validation**: Implementing dual-function system (check_single_answer + calculate_level2_score)
+- **✅ Server validation**: Dual-function system (check_single_answer + calculate_level2_score)
+- **✅ Custom exit warnings**: Prevent accidental loss of progress
+
+### CROSSWORD CHALLENGE (UI/UX COMPLETE)
+- **✅ Interactive Grid**: 14x19 grid with click-to-type functionality
+- **✅ Word Highlighting**: Active word highlighted in distinct colors
+- **✅ Auto-advance**: Types and moves to next cell automatically
+- **✅ Smart Intersections**: Handles shared letters between words correctly
+- **✅ Visual Feedback**: Green→grey for correct (1s delay), red→clear for wrong (2s delay)
+- **✅ Word Locking**: Correct words lock and become uneditable
+- **✅ Check Functions**: Both "Check Word" and "Check All" with proper intersection handling
+- **✅ Progress Tracking**: Live score and completion percentage display
+- **✅ Retro Theme**: Consistent with other challenges (neon colors, pixel fonts)
+- **✅ Exit Warnings**: Custom modal for unsaved progress
+- **🚧 Server Integration**: Validation, auto-save, and database storage pending
+
+#### Crossword Words and Layout
+```
+Current Grid: 14x19 with 12 implemented words (9 distinct numbers, some have both across/down)
+1-across: DANA (Mauritius vacation) - Row 0, Col 3-6
+2-down: ANKUR (Event Coordinator) - Row 0-4, Col 6  
+3-across: CYRIL (Music Production) - Row 4, Col 4-8
+3-down: CHARA (Bollywood Music) - Row 4-8, Col 4
+4-across: RIDHIMA (Innovation Award) - Row 7, Col 4-10
+5-down: MOHAK (Delhi Guitar) - Row 7-11, Col 9
+6-across: EMERY (Farm) - Row 7, Col 14-18
+7-down: MIRIAM (Leader Fighter) - Row 7-12, Col 15
+8-down: CASPAR (Privacy) - Row 8-13, Col 0
+9-across: SHUBHAM (February Marriage) - Row 9, Col 5-11  
+9-down: SARA (Son HS Grad) - Row 9-12, Col 5
+10-across: SOUMYA (Selfie Queen) - Row 10, Col 0-5
+11-across: KRITIKA (December Marriage) - Row 11, Col 9-15
+12-across: ADITYA (Table Tennis) - Row 12, Col 0-5
+```
 
 ## 🔧 Development Commands
 ```bash
@@ -288,5 +352,23 @@ git push        # Auto-deploys to Vercel
 
 ---
 
+## 🔮 Next Steps for Crossword Challenge
+
+### Server Integration (PENDING)
+1. **Create Supabase Tables**: `crossword_progress` and `crossword_answers`
+2. **Move Answers to Server**: Remove hardcoded answers from frontend to prevent cheating
+3. **Implement Auto-save**: Save progress every 10 seconds + on cell changes
+4. **Add Validation Functions**: Server-side checking for individual words and full crossword
+5. **One-time Play**: Restrict to single play per user like other challenges
+6. **Results Modal**: Completion screen with final score and fun message
+
+### Technical Notes
+- **Intersection Logic**: Critical for crossword - shared letters between words must be preserved
+- **Grid-based Validation**: Uses actual grid cells instead of answers object to handle intersections
+- **Visual Feedback Flow**: Green (1s) → Grey (locked) for correct, Red (2s) → Clear for wrong
+- **Grid Size**: 14x19 optimized for current word layout
+
+---
+
 *This file contains the complete context of the Literally Invented project for future Claude sessions.*
-*Last Updated: 2025-08-31*
+*Last Updated: 2025-08-31 - Added complete crossword UI/UX implementation*

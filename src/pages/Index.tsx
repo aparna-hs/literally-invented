@@ -122,14 +122,21 @@ const Index = () => {
                   onClick={() => window.location.href = '/level1'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
                 >
-                  🔍 KNOW YOUR CREW
+                  🔍 SQUAD SCANNER
                 </Button>
                 
                 <Button 
                   onClick={() => window.location.href = '/level2'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-purple hover:to-neon-cyan"
                 >
-                  ⏰ TIMELINE CHALLENGE
+                  ⏰ TIMELINE TAKEDOWN
+                </Button>
+                
+                <Button 
+                  onClick={() => window.location.href = '/level3'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-green to-neon-cyan hover:from-neon-cyan hover:to-neon-green"
+                >
+                  🧩 CROSSWORD CONQUEST
                 </Button>
                 
                 <Button 

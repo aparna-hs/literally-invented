@@ -46,8 +46,23 @@ const Level2Game = () => {
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [hasPlayedBefore, setHasPlayedBefore] = useState(false);
   const [existingScore, setExistingScore] = useState<any>(null);
+  const [showExitWarning, setShowExitWarning] = useState(false);
   
   const { isAuthenticated } = useAuth();
+
+  const handleNavigation = (path: string) => {
+    if (!isGameComplete && (bucket2024.length > 0 || bucket2025.length > 0)) {
+      setShowExitWarning(true);
+      return;
+    }
+    window.location.href = path;
+  };
+
+  const confirmExit = (path: string) => {
+    setShowExitWarning(false);
+    window.location.href = path;
+  };
+
 
   // Setup game queue and check if user has played before
   useEffect(() => {
@@ -340,7 +355,7 @@ const Level2Game = () => {
         {/* Navigation Buttons */}
         <div className="flex justify-center gap-4 mb-8">
           <Button
-            onClick={() => window.location.href = '/'}
+            onClick={() => handleNavigation('/')}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
@@ -348,7 +363,13 @@ const Level2Game = () => {
             🏠 HOME
           </Button>
           <Button
-            onClick={logout}
+            onClick={() => {
+              if (!isGameComplete && (bucket2024.length > 0 || bucket2025.length > 0)) {
+                setShowExitWarning(true);
+              } else {
+                logout();
+              }
+            }}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-red text-neon-red hover:bg-neon-red/20"
@@ -399,6 +420,37 @@ const Level2Game = () => {
                     className="font-retro border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
                   >
                     🏠 HOME
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Exit Warning Modal */}
+        {showExitWarning && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+            <Card className="max-w-md w-full p-6 bg-card/95 border-2 border-neon-red animate-pulse-border">
+              <div className="text-center">
+                <div className="text-4xl mb-4">⚠️</div>
+                <h3 className="text-xl font-retro glow-red mb-4">WAIT!</h3>
+                <p className="font-pixel text-sm mb-6">
+                  You have unsaved progress! Until you finish the level and complete all placements, your score won't be saved.
+                </p>
+                
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    onClick={() => setShowExitWarning(false)}
+                    className="font-retro bg-neon-green hover:bg-neon-cyan"
+                  >
+                    🔄 CONTINUE PLAYING
+                  </Button>
+                  <Button
+                    onClick={() => confirmExit('/')}
+                    variant="outline"
+                    className="font-retro border-neon-red text-neon-red hover:bg-neon-red/20"
+                  >
+                    🚪 LEAVE ANYWAY
                   </Button>
                 </div>
               </div>

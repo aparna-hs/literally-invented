@@ -71,6 +71,21 @@ const Level1Game = () => {
   
   const { isAuthenticated } = useAuth();
 
+  const [showExitWarning, setShowExitWarning] = useState(false);
+
+  const handleNavigation = (path: string) => {
+    if (!isSubmitted && Object.keys(matches).length > 0) {
+      setShowExitWarning(true);
+      return;
+    }
+    window.location.href = path;
+  };
+
+  const confirmExit = (path: string) => {
+    setShowExitWarning(false);
+    window.location.href = path;
+  };
+
   // Shuffle names and check if user has played before
   useEffect(() => {
     const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
@@ -403,7 +418,7 @@ const Level1Game = () => {
         {/* Navigation Buttons */}
         <div className="flex justify-center gap-4 mb-48">
           <Button
-            onClick={() => window.location.href = '/'}
+            onClick={() => handleNavigation('/')}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
@@ -411,7 +426,13 @@ const Level1Game = () => {
             🏠 HOME
           </Button>
           <Button
-            onClick={logout}
+            onClick={() => {
+              if (!isSubmitted && Object.keys(matches).length > 0) {
+                setShowExitWarning(true);
+              } else {
+                logout();
+              }
+            }}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-red text-neon-red hover:bg-neon-red/20"
@@ -490,6 +511,37 @@ const Level1Game = () => {
                 <p className="font-pixel text-sm glow-purple animate-pulse">
                   {getScoreMessage()}
                 </p>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Exit Warning Modal */}
+        {showExitWarning && (
+          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+            <Card className="max-w-md w-full p-6 bg-card/95 border-2 border-neon-red animate-pulse-border">
+              <div className="text-center">
+                <div className="text-4xl mb-4">⚠️</div>
+                <h3 className="text-xl font-retro glow-red mb-4">WAIT!</h3>
+                <p className="font-pixel text-sm mb-6">
+                  You have unsaved progress! Until you finish the level and submit your answers, your score won't be saved.
+                </p>
+                
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    onClick={() => setShowExitWarning(false)}
+                    className="font-retro bg-neon-green hover:bg-neon-cyan"
+                  >
+                    🔄 CONTINUE PLAYING
+                  </Button>
+                  <Button
+                    onClick={() => confirmExit('/')}
+                    variant="outline"
+                    className="font-retro border-neon-red text-neon-red hover:bg-neon-red/20"
+                  >
+                    🚪 LEAVE ANYWAY
+                  </Button>
+                </div>
               </div>
             </Card>
           </div>

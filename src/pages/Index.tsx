@@ -31,7 +31,7 @@ const Index = () => {
       // Get completed scores
       const { data: completedScores } = await supabase
         .from('scores')
-        .select('score')
+        .select('score, level')
         .eq('user_id', user.id);
 
       let totalScore = 0;
@@ -42,26 +42,32 @@ const Index = () => {
         challengeCount = completedScores.length;
       }
 
-      // Get temp scores from Level 2 (Timeline Takedown)
-      const { data: level2TempScore } = await supabase
-        .rpc('get_level2_temp_score', { 
-          player_user_id: user.id 
-        });
+      // Get temp scores from Level 2 (Timeline Takedown) - only if not completed
+      const level2Completed = completedScores?.find(s => s.level === 2);
+      if (!level2Completed) {
+        const { data: level2TempScore } = await supabase
+          .rpc('get_level2_temp_score', { 
+            player_user_id: user.id 
+          });
 
-      if (level2TempScore > 0) {
-        totalScore += level2TempScore;
-        // Don't count as completed challenge, just add score
+        if (level2TempScore > 0) {
+          totalScore += level2TempScore;
+          // Don't count as completed challenge, just add score
+        }
       }
 
-      // Get temp scores from Level 4 (Bluff Buster)
-      const { data: level4TempScore } = await supabase
-        .rpc('get_bluff_buster_temp_score', { 
-          player_user_id: user.id 
-        });
+      // Get temp scores from Level 4 (Bluff Buster) - only if not completed
+      const level4Completed = completedScores?.find(s => s.level === 4);
+      if (!level4Completed) {
+        const { data: level4TempScore } = await supabase
+          .rpc('get_bluff_buster_temp_score', { 
+            player_user_id: user.id 
+          });
 
-      if (level4TempScore > 0) {
-        totalScore += level4TempScore;
-        // Don't count as completed challenge, just add score
+        if (level4TempScore > 0) {
+          totalScore += level4TempScore;
+          // Don't count as completed challenge, just add score
+        }
       }
 
       // Get temp scores from Level 3 (Crossword) - only if not completed

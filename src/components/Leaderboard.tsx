@@ -64,6 +64,35 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
         }
       }
 
+      // Level 3 (Crossword) temp scores - only for users who haven't completed it
+      const { data: level3TempProgress } = await supabase
+        .from('crossword_progress')
+        .select('user_id')
+      
+      const level3TempUserIds = level3TempProgress ? [...new Set(level3TempProgress.map(t => t.user_id))] : []
+      
+      // Get users who have completed crossword (level 3) to exclude them from temp scores
+      const { data: level3CompletedUsers } = await supabase
+        .from('scores')
+        .select('user_id')
+        .eq('level', 3)
+      
+      const completedLevel3UserIds = new Set(level3CompletedUsers?.map(u => u.user_id) || [])
+      
+      for (const userId of level3TempUserIds) {
+        // Only get temp score if user hasn't completed the crossword
+        if (!completedLevel3UserIds.has(userId)) {
+          const { data: tempScore } = await supabase
+            .rpc('get_crossword_temp_score', { 
+              player_user_id: userId 
+            })
+          if (tempScore > 0) {
+            const existing = tempScoresByUser.get(userId) || 0
+            tempScoresByUser.set(userId, existing + tempScore)
+          }
+        }
+      }
+
       // 2. Get all scores from scores table
       const { data: completedScores } = await supabase
         .from('scores')

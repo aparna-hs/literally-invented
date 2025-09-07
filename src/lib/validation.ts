@@ -477,3 +477,45 @@ export const getBluffBusterProgress = async (): Promise<{
     }
   }
 }
+
+// Get crossword temp score for leaderboard
+export const getCrosswordTempScore = async (): Promise<{ 
+  success: boolean; 
+  tempScore: number;
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .from('crossword_progress')
+      .select('score')
+      .eq('user_id', user.id)
+      .single()
+
+    if (error) {
+      // No progress found is not an error for temp score
+      if (error.code === 'PGRST116') {
+        return { success: true, tempScore: 0 }
+      }
+      console.error('Error fetching crossword temp score:', error)
+      throw error
+    }
+    
+    return {
+      success: true,
+      tempScore: data?.score || 0
+    }
+
+  } catch (error: any) {
+    console.error('Error getting crossword temp score:', error)
+    return {
+      success: false,
+      tempScore: 0,
+      error: error.message
+    }
+  }
+}

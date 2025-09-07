@@ -64,6 +64,20 @@ const Index = () => {
         // Don't count as completed challenge, just add score
       }
 
+      // Get temp scores from Level 3 (Crossword) - only if not completed
+      const level3Completed = completedScores?.find(s => s.level === 3);
+      if (!level3Completed) {
+        const { data: level3TempScore } = await supabase
+          .rpc('get_crossword_temp_score', { 
+            player_user_id: user.id 
+          });
+
+        if (level3TempScore > 0) {
+          totalScore += level3TempScore;
+          // Don't count as completed challenge, just add score
+        }
+      }
+
       setUserTotalScore(totalScore);
       setCompletedChallenges(challengeCount);
     } catch (error) {

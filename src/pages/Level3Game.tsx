@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/auth";
 import { validateCrosswordWord, validateCrosswordAll, saveCrosswordProgress, getCrosswordProgress } from "@/lib/validation";
+import { getCurrentUser } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 interface CrosswordClue {
@@ -91,6 +93,51 @@ const Level3Game = () => {
         return;
       }
 
+      // First check if user has completed crossword (level 3)
+      const { data: completedScore } = await supabase
+        .from('scores')
+        .select('score, completed_at')
+        .eq('user_id', (await getCurrentUser())?.id)
+        .eq('level', 3)
+        .single();
+
+      if (completedScore) {
+        // User has completed - still load their crossword answers for viewing
+        const progress = await getCrosswordProgress();
+        if (progress.success) {
+          setAnswers(progress.answers);
+          setScore(completedScore.score); // Use completed score from database
+          setCompletedWords(14); // Show as fully completed
+          
+          // Rebuild grid from saved answers
+          const newGrid = Array(14).fill(null).map(() => Array(19).fill(''));
+          const completedWordsSet = new Set<string>();
+          
+          Object.entries(progress.answers).forEach(([wordKey, answer]) => {
+            const clue = clues.find(c => `${c.number}-${c.direction}` === wordKey);
+            if (clue && answer.length === clue.length) {
+              // Fill grid with saved answer
+              for (let i = 0; i < clue.length; i++) {
+                const row = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
+                const col = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
+                newGrid[row][col] = answer[i];
+              }
+              completedWordsSet.add(wordKey);
+            }
+          });
+          
+          setGrid(newGrid);
+          setLockedWords(completedWordsSet); // Lock all words since completed
+        }
+        
+        // Show completion modal
+        setFinalScore(completedScore.score);
+        setShowCompletionModal(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // User hasn't completed - load progress
       const progress = await getCrosswordProgress();
       if (progress.success) {
         setAnswers(progress.answers);
@@ -746,7 +793,10 @@ const Level3Game = () => {
                 
                 <div className="bg-neon-green/10 border border-neon-green/30 rounded-lg p-4 mb-6">
                   <p className="font-pixel text-sm glow-green animate-pulse">
-                    🎉 Legendary! You've mastered the ultimate SI team knowledge challenge! Your crossword prowess is unmatched! ✨
+                    {completedWords === 14 
+                      ? "🎉 Legendary! You've mastered the ultimate SI team knowledge challenge! Your crossword prowess is unmatched! ✨"
+                      : "🎮 Awesome! You've already conquered this crossword challenge! Your SI team knowledge is legendary! ✨"
+                    }
                   </p>
                 </div>
                 

@@ -544,6 +544,8 @@ get_bluff_buster_temp_score() - Temp score for leaderboard
 - **Squad Scanner consistency**: Results modal shows only HOME button (not Timeline button)
 - **Unified post-game experience**: All 4 challenges have identical completion flow
 - **Team-focused messaging**: Changed "Great job being a Squad Scanner" → "Great job learning more about team SI"
+- **Updated game rules**: Comprehensive rules dialog with all 4 games, proper visual hierarchy
+- **Homepage score display**: Live user stats showing total score and completion progress
 
 ### User Experience Benefits
 - ✅ **Better onboarding**: Easy games first, complex games last
@@ -562,7 +564,50 @@ Homepage (difficulty order):
 Post-completion: All games → Results modal → HOME button → User choice
 ```
 
+### Homepage User Experience
+```
+Authenticated users see:
+- Personal greeting: "WELCOME USERNAME!"
+- Live score dashboard: Total Score + Completed Challenges (X/4)
+- Includes both completed scores + temp scores from partial progress
+- Loading state while fetching user stats
+- Only displays score box if user has any points
+```
+
+---
+
+## ✅ Final Polish: Homepage Enhancement (2025-09-07)
+
+### Game Rules Dialog Improvements
+- **Enhanced visual hierarchy**: Centered "GAME RULES" title with underline separator
+- **Better organization**: All 4 games listed in play order with clear descriptions
+- **Highlighted key info**: Scoring and win condition in colored boxes
+- **Updated win condition**: "Complete challenges and top the leaderboard to become the Ultimate SI Team Expert!"
+- **Proper spacing**: Clear sections with adequate white space
+
+### Homepage Score Display
+```typescript
+// New Features Added:
+- Live total score calculation (completed + temp scores)
+- Challenge completion counter (X/4)
+- Includes temp scores from Timeline Takedown and Bluff Buster
+- Loading state while fetching stats
+- Only shows if user has points > 0
+```
+
+### User Engagement Features
+- **Personal greeting**: "WELCOME USERNAME!" (no comma, cleaner look)
+- **Achievement motivation**: Users see their progress on homepage
+- **Competition element**: Total score display encourages leaderboard climbing
+- **Return value**: Homepage becomes destination to check stats
+
+### Technical Implementation
+- **Real-time scoring**: Fetches from scores table + temp score functions
+- **Efficient loading**: Only loads when authenticated
+- **Error handling**: Graceful fallback if score fetch fails
+- **Performance optimized**: Minimal API calls, cached results
+
 ---
 
 *This file contains the complete context of the Literally Invented project for future Claude sessions.*
-*Last Updated: 2025-09-07 - UX improvements: game ordering, UI consistency, team-focused messaging*
+*Last Updated: 2025-09-07 - Complete user experience optimization: game rules, homepage stats, engagement features*

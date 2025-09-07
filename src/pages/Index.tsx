@@ -1,16 +1,77 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import LoginForm from "@/components/LoginForm";
 import Leaderboard from "@/components/Leaderboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 const Index = () => {
   const [showRules, setShowRules] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [userTotalScore, setUserTotalScore] = useState<number>(0);
+  const [completedChallenges, setCompletedChallenges] = useState<number>(0);
+  const [loadingScore, setLoadingScore] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
+
+  // Fetch user's total score when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchUserScore();
+    }
+  }, [isAuthenticated, user]);
+
+  const fetchUserScore = async () => {
+    if (!user) return;
+    
+    setLoadingScore(true);
+    try {
+      // Get completed scores
+      const { data: completedScores } = await supabase
+        .from('scores')
+        .select('score')
+        .eq('user_id', user.id);
+
+      let totalScore = 0;
+      let challengeCount = 0;
+
+      if (completedScores) {
+        totalScore = completedScores.reduce((sum, score) => sum + score.score, 0);
+        challengeCount = completedScores.length;
+      }
+
+      // Get temp scores from Level 2 (Timeline Takedown)
+      const { data: level2TempScore } = await supabase
+        .rpc('get_level2_temp_score', { 
+          player_user_id: user.id 
+        });
+
+      if (level2TempScore > 0) {
+        totalScore += level2TempScore;
+        // Don't count as completed challenge, just add score
+      }
+
+      // Get temp scores from Level 4 (Bluff Buster)
+      const { data: level4TempScore } = await supabase
+        .rpc('get_bluff_buster_temp_score', { 
+          player_user_id: user.id 
+        });
+
+      if (level4TempScore > 0) {
+        totalScore += level4TempScore;
+        // Don't count as completed challenge, just add score
+      }
+
+      setUserTotalScore(totalScore);
+      setCompletedChallenges(challengeCount);
+    } catch (error) {
+      console.error('Error fetching user score:', error);
+    } finally {
+      setLoadingScore(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -64,12 +125,27 @@ const Index = () => {
               </DialogTrigger>
               <DialogContent className="bg-card border-neon-cyan">
                 <DialogHeader>
-                  <DialogTitle className="font-retro glow-cyan">GAME RULES</DialogTitle>
-                  <DialogDescription className="font-pixel space-y-4">
-                    <div>🎯 <strong>LEVEL 1:</strong> Match colleagues with their unique talents and hobbies</div>
-                    <div>👶 <strong>LEVEL 2:</strong> Identify team members from their baby photos</div>
-                    <div>⚡ <strong>SCORING:</strong> Earn points for correct matches, lose points for wrong guesses</div>
-                    <div>🏆 <strong>WIN CONDITION:</strong> Complete all levels to become the Ultimate Colleague Detective!</div>
+                  <DialogTitle className="font-retro glow-cyan text-center text-2xl">GAME RULES</DialogTitle>
+                  <div className="border-b border-neon-cyan/40 mb-6"></div>
+                  <DialogDescription className="font-pixel space-y-3">
+                    <div className="mb-6">
+                      <h3 className="font-retro text-lg glow-pink mb-4">🎮 CHALLENGES:</h3>
+                      <div className="space-y-3 ml-2">
+                        <div>⏰ <strong>TIMELINE TAKEDOWN:</strong> Sort SI team members by their join year (2024 vs 2025)</div>
+                        <div>🔍 <strong>SQUAD SCANNER:</strong> Match colleagues with their unique talents and hobbies</div>
+                        <div>🕵️ <strong>BLUFF BUSTER:</strong> Detect facts vs bluffs about your SI teammates</div>
+                        <div>🧩 <strong>CROSSWORD CONQUEST:</strong> Solve team-themed crossword clues</div>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-neon-purple/30 pt-4 space-y-3">
+                      <div className="bg-neon-cyan/10 border border-neon-cyan/30 rounded p-3">
+                        <strong className="text-neon-cyan">⚡ SCORING:</strong> Earn 10 points per correct answer, build your total score
+                      </div>
+                      <div className="bg-neon-pink/10 border border-neon-pink/30 rounded p-3">
+                        <strong className="text-neon-pink">🏆 WIN CONDITION:</strong> Complete challenges and top the leaderboard to become the Ultimate SI Team Expert!
+                      </div>
+                    </div>
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>
@@ -110,8 +186,29 @@ const Index = () => {
               <div className="mb-6 text-center">
                 <div className="text-4xl mb-2 animate-float">🕹️</div>
                 <h3 className="text-xl font-retro glow-pink mb-2">
-                  WELCOME BACK, {user?.display_name?.toUpperCase()}!
+                  WELCOME {user?.display_name?.toUpperCase()}!
                 </h3>
+                
+                {/* User Score Display */}
+                {loadingScore ? (
+                  <div className="font-pixel text-sm text-muted-foreground animate-pulse">
+                    ⏳ Loading your stats...
+                  </div>
+                ) : userTotalScore > 0 ? (
+                  <div className="bg-background/70 border border-neon-cyan rounded-lg p-3 mb-4 inline-block">
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <div className="text-lg font-retro glow-cyan">TOTAL SCORE</div>
+                        <div className="text-2xl font-pixel text-neon-green">{userTotalScore}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-retro glow-cyan">COMPLETED</div>
+                        <div className="text-2xl font-pixel text-neon-green">{completedChallenges}/4</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+                
                 <p className="font-pixel text-sm text-muted-foreground">
                   Choose your challenge and prove your team knowledge
                 </p>

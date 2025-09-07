@@ -302,8 +302,11 @@ const Level3Game = () => {
     // Validate with server
     const result = await validateCrosswordWord(selectedWord.number, selectedWord.direction, gridAnswer);
     
+    console.log('Check Word server result:', result);
+    
     // Always update score from server (server knows the current total)
     if (result.success && result.score !== undefined) {
+      console.log('Updating score from', score, 'to', result.score);
       setScore(result.score);
     }
     

@@ -27,44 +27,63 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
   const fetchLeaderboard = async () => {
     setLoading(true)
     try {
-      // Fetch total scores per user across all levels
-      const { data, error } = await supabase
-        .from('scores')
-        .select(`
-          user_id,
-          score,
-          completed_at,
-          user:users(display_name)
-        `)
-        .order('completed_at', { ascending: false })
-
-      if (error) throw error
-
-      // Group by user and sum scores
-      const userScores = new Map<number, LeaderboardEntry>()
-
-      data?.forEach((entry: any) => {
-        const userId = entry.user_id
-        const existing = userScores.get(userId)
-
-        if (existing) {
-          existing.total_score += entry.score
-          // Keep the most recent play date
-          if (new Date(entry.completed_at) > new Date(existing.last_played)) {
-            existing.last_played = entry.completed_at
-          }
-        } else {
-          userScores.set(userId, {
-            user_id: userId,
-            display_name: entry.user.display_name,
-            total_score: entry.score,
-            last_played: entry.completed_at
+      // 1. Get unique user_ids from temp answers and their temp scores
+      const { data: tempAnswers } = await supabase
+        .from('level2_temp_answers')
+        .select('user_id')
+      
+      const tempUserIds = tempAnswers ? [...new Set(tempAnswers.map(t => t.user_id))] : []
+      const tempScoresByUser = new Map<number, number>()
+      
+      for (const userId of tempUserIds) {
+        const { data: tempScore } = await supabase
+          .rpc('get_level2_temp_score', { 
+            player_user_id: userId 
           })
+        if (tempScore > 0) {
+          tempScoresByUser.set(userId, tempScore)
         }
+      }
+
+      // 2. Get all scores from scores table
+      const { data: completedScores } = await supabase
+        .from('scores')
+        .select('user_id, score')
+
+      // 3. Add up scores by user_id
+      const totalScoresByUser = new Map<number, number>()
+      
+      // Add completed scores
+      completedScores?.forEach((entry: any) => {
+        const existing = totalScoresByUser.get(entry.user_id) || 0
+        totalScoresByUser.set(entry.user_id, existing + entry.score)
       })
 
-      // Convert to array and sort by total score
-      const sortedScores = Array.from(userScores.values())
+      // Add temp scores
+      tempScoresByUser.forEach((tempScore, userId) => {
+        const existing = totalScoresByUser.get(userId) || 0
+        totalScoresByUser.set(userId, existing + tempScore)
+      })
+
+      // 4. Get display names from users table
+      const { data: allUsers } = await supabase
+        .from('users')
+        .select('id, display_name')
+
+      // 5. Create leaderboard entries and show top 10
+      const leaderboardEntries: LeaderboardEntry[] = []
+      
+      totalScoresByUser.forEach((totalScore, userId) => {
+        const user = allUsers?.find(u => u.id === userId)
+        leaderboardEntries.push({
+          user_id: userId,
+          display_name: user?.display_name || 'Unknown',
+          total_score: totalScore,
+          last_played: new Date().toISOString()
+        })
+      })
+
+      const sortedScores = leaderboardEntries
         .sort((a, b) => b.total_score - a.total_score)
         .slice(0, 10) // Top 10
 

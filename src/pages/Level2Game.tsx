@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getUserScore } from "@/lib/scores";
-import { checkSingleLevel2Answer, calculateLevel2Score } from "@/lib/validation";
+import { checkSingleLevel2Answer, calculateLevel2Score, getLevel2Progress } from "@/lib/validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/auth";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
@@ -47,14 +47,13 @@ const Level2Game = () => {
   const [hasPlayedBefore, setHasPlayedBefore] = useState(false);
   const [existingScore, setExistingScore] = useState<any>(null);
   const [showExitWarning, setShowExitWarning] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [alreadyAnswered, setAlreadyAnswered] = useState<Set<string>>(new Set());
   
   const { isAuthenticated } = useAuth();
 
   const handleNavigation = (path: string) => {
-    if (!isGameComplete && (bucket2024.length > 0 || bucket2025.length > 0)) {
-      setShowExitWarning(true);
-      return;
-    }
+    // No exit warning needed - progress auto-saved to database
     window.location.href = path;
   };
 
@@ -73,14 +72,71 @@ const Level2Game = () => {
 
   const checkExistingScore = async () => {
     const score = await getUserScore(2); // Level 2
+    
     if (score) {
+      // User has completed the game
       setHasPlayedBefore(true);
       setExistingScore(score);
+      setIsLoading(false);
     } else {
-      // Only start game if user hasn't played before
-      const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
-      setShuffledQueue(shuffled);
-      setCurrentName(shuffled[0] || null);
+      // Check for partial progress
+      const progress = await getLevel2Progress();
+      
+      if (progress.success && progress.tempAnswers.length > 0) {
+        // User has partial progress - rebuild buckets from saved answers
+        const answeredSet = new Set(progress.tempAnswers.map(a => a.player_id.toString()));
+        setAlreadyAnswered(answeredSet);
+        
+        // Rebuild buckets from temp answers
+        const new2024: Colleague[] = [];
+        const new2025: Colleague[] = [];
+        let correctCount = 0;
+        
+        progress.tempAnswers.forEach(tempAnswer => {
+          const colleague = colleagues.find(c => c.id === tempAnswer.player_id.toString());
+          if (colleague) {
+            const colleagueWithResult = {
+              ...colleague,
+              isCorrect: tempAnswer.is_correct,
+              droppedYear: tempAnswer.submitted_year
+            };
+            
+            if (tempAnswer.submitted_year === 2024) {
+              new2024.push(colleagueWithResult);
+            } else {
+              new2025.push(colleagueWithResult);
+            }
+            
+            if (tempAnswer.is_correct) {
+              correctCount++;
+            }
+          }
+        });
+        
+        setBucket2024(new2024);
+        setBucket2025(new2025);
+        setCorrectCount(correctCount);
+        setScore(correctCount * 10); // 10 points per correct answer
+        
+        const unanswered = colleagues.filter(c => !answeredSet.has(c.id));
+        const shuffled = unanswered.sort(() => Math.random() - 0.5);
+        
+        setShuffledQueue(shuffled);
+        setCurrentName(shuffled[0] || null);
+        
+        // If all questions answered but no final score, trigger completion
+        if (unanswered.length === 0) {
+          setIsGameComplete(true);
+          handleGameComplete();
+        }
+      } else {
+        // Fresh start - no progress
+        const shuffled = [...colleagues].sort(() => Math.random() - 0.5);
+        setShuffledQueue(shuffled);
+        setCurrentName(shuffled[0] || null);
+      }
+      
+      setIsLoading(false);
     }
   };
 
@@ -205,6 +261,21 @@ const Level2Game = () => {
                 </div>
               </div>
             </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-retro glow-cyan animate-pulse mb-4">
+            ⏳ LOADING TIMELINE...
+          </div>
+          <div className="text-lg font-pixel glow-purple">
+            Checking your progress
           </div>
         </div>
       </div>

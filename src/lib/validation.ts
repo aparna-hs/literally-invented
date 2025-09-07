@@ -315,3 +315,40 @@ export const getCrosswordProgress = async (): Promise<{
     }
   }
 }
+
+// Get Level 2 complete progress with answers and results
+export const getLevel2Progress = async (): Promise<{ 
+  success: boolean; 
+  tempAnswers: { player_id: number; submitted_year: number; is_correct: boolean }[];
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .from('level2_temp_answers')
+      .select('player_id, submitted_year, is_correct')
+      .eq('user_id', user.id)
+
+    if (error) {
+      console.error('Error fetching temp progress:', error)
+      throw error
+    }
+    
+    return {
+      success: true,
+      tempAnswers: data || []
+    }
+
+  } catch (error: any) {
+    console.error('Error getting Level 2 progress:', error)
+    return {
+      success: false,
+      tempAnswers: [],
+      error: error.message
+    }
+  }
+}

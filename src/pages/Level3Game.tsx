@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { logout } from "@/lib/auth";
+import { validateCrosswordWord, validateCrosswordAll, saveCrosswordProgress, getCrosswordProgress } from "@/lib/validation";
 import retroBg from "@/assets/retro-gaming-bg.jpg";
 
 interface CrosswordClue {
   number: number;
   direction: 'across' | 'down';
   clue: string;
-  answer: string;
   startRow: number;
   startCol: number;
   length: number;
@@ -18,43 +18,43 @@ interface CrosswordClue {
 const Level3Game = () => {
   // Crossword layout - adding 3 columns to the left (shift all by +3)
   const clues: CrosswordClue[] = [
-    // Row 0: 1-across DANA (4 letters), 2-down ANKUR starts from last letter of DANA
-    { number: 1, direction: 'across', clue: "Went on vacation to Mauritius this year", answer: "DANA", startRow: 0, startCol: 3, length: 4 },
-    { number: 2, direction: 'down', clue: "Mr. Event Coordinator", answer: "ANKUR", startRow: 0, startCol: 6, length: 5 },
+    // Row 0: 1-across (4 letters), 2-down starts from last letter of 1-across
+    { number: 1, direction: 'across', clue: "Went on vacation to Mauritius this year", startRow: 0, startCol: 3, length: 4 },
+    { number: 2, direction: 'down', clue: "Mr. Event Coordinator", startRow: 0, startCol: 6, length: 5 },
     
-    // Row 4: 3-across CYRIL intersects with 2-down at row 4, col 6 (R matches R)
-    { number: 3, direction: 'across', clue: "Into Music Production", answer: "CYRIL", startRow: 4, startCol: 4, length: 5 },
-    { number: 3, direction: 'down', clue: "Bollywood Music Lover", answer: "CHARA", startRow: 4, startCol: 4, length: 5 },
+    // Row 4: 3-across intersects with 2-down at row 4, col 6
+    { number: 3, direction: 'across', clue: "Into Music Production", startRow: 4, startCol: 4, length: 5 },
+    { number: 3, direction: 'down', clue: "Bollywood Music Lover", startRow: 4, startCol: 4, length: 5 },
     
-    // Row 7: 4-across RIDHIMA starts from 4th letter of 3-down (A matches A)
-    { number: 4, direction: 'across', clue: "Innovation Award Winner", answer: "RIDHIMA", startRow: 7, startCol: 4, length: 7 },
+    // Row 7: 4-across starts from 4th letter of 3-down
+    { number: 4, direction: 'across', clue: "Innovation Award Winner", startRow: 7, startCol: 4, length: 7 },
     
-    // 5-down MOHAK starts from 6th letter of 4-across (M matches M)
-    { number: 5, direction: 'down', clue: "a Delhite who Plays Guitar", answer: "MOHAK", startRow: 7, startCol: 9, length: 5 },
+    // 5-down starts from 6th letter of 4-across
+    { number: 5, direction: 'down', clue: "a Delhite who Plays Guitar", startRow: 7, startCol: 9, length: 5 },
     
-    // 9-across SHUBHAM where 5th letter intersects with 3rd letter of 5-down
-    { number: 9, direction: 'across', clue: "Got married in February", answer: "SHUBHAM", startRow: 9, startCol: 5, length: 7 },
+    // 9-across where 5th letter intersects with 3rd letter of 5-down
+    { number: 9, direction: 'across', clue: "Got married in February", startRow: 9, startCol: 5, length: 7 },
     
-    // 9-down SARA
-    { number: 9, direction: 'down', clue: "Son graduated HS this year", answer: "SARA", startRow: 9, startCol: 5, length: 4 },
+    // 9-down
+    { number: 9, direction: 'down', clue: "Son graduated HS this year", startRow: 9, startCol: 5, length: 4 },
     
-    // 8-down CASPAR - 3rd letter is 1st of 10-across, 5th letter is 1st of 12-across
-    { number: 8, direction: 'down', clue: "Can't disclose due to privacy issues :P", answer: "CASPAR", startRow: 8, startCol: 0, length: 6 },
+    // 8-down - 3rd letter is 1st of 10-across, 5th letter is 1st of 12-across
+    { number: 8, direction: 'down', clue: "Can't disclose due to privacy issues :P", startRow: 8, startCol: 0, length: 6 },
     
-    // 10-across SOUMYA (6 letters) - last letter matches 2nd letter of 9-down
-    { number: 10, direction: 'across', clue: "Selfie Queen!", answer: "SOUMYA", startRow: 10, startCol: 0, length: 6 },
+    // 10-across - last letter matches 2nd letter of 9-down
+    { number: 10, direction: 'across', clue: "Selfie Queen!", startRow: 10, startCol: 0, length: 6 },
     
-    // 6-across EMERY - 2nd letter is first letter of 7-down
-    { number: 6, direction: 'across', clue: "Grew up on a farm", answer: "EMERY", startRow: 7, startCol: 14, length: 5 },
+    // 6-across - 2nd letter is first letter of 7-down
+    { number: 6, direction: 'across', clue: "Grew up on a farm", startRow: 7, startCol: 14, length: 5 },
     
-    // 7-down MIRIAM - 5th letter matches last letter of 11-across
-    { number: 7, direction: 'down', clue: "The Leader. The Fighter. The Inspiration", answer: "MIRIAM", startRow: 7, startCol: 15, length: 6 },
+    // 7-down - 5th letter matches last letter of 11-across
+    { number: 7, direction: 'down', clue: "The Leader. The Fighter. The Inspiration", startRow: 7, startCol: 15, length: 6 },
     
-    // 11-across KRITIKA - first letter matches last letter of 5-down
-    { number: 11, direction: 'across', clue: "Getting married in December", answer: "KRITIKA", startRow: 11, startCol: 9, length: 7 },
+    // 11-across - first letter matches last letter of 5-down
+    { number: 11, direction: 'across', clue: "Getting married in December", startRow: 11, startCol: 9, length: 7 },
     
-    // 12-across ADITYA (6 letters) - last letter matches last letter of 9-down
-    { number: 12, direction: 'across', clue: "Table Tennis Wizard", answer: "ADITYA", startRow: 12, startCol: 0, length: 6 }
+    // 12-across - last letter matches last letter of 9-down
+    { number: 12, direction: 'across', clue: "Table Tennis Wizard", startRow: 12, startCol: 0, length: 6 }
   ];
 
   const [grid, setGrid] = useState<string[][]>(() => {
@@ -71,11 +71,68 @@ const Level3Game = () => {
   const [incorrectWords, setIncorrectWords] = useState<Set<string>>(new Set());
   const [correctWords, setCorrectWords] = useState<Set<string>>(new Set());
   const [showExitWarning, setShowExitWarning] = useState(false);
+  const [isCheckingWord, setIsCheckingWord] = useState(false);
+  const [isCheckingAll, setIsCheckingAll] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { isAuthenticated } = useAuth();
   const inputRefs = useRef<(HTMLInputElement | null)[][]>(
     Array(14).fill(null).map(() => Array(19).fill(null))
   );
+
+  // Load saved progress on component mount
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (!isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
+
+      const progress = await getCrosswordProgress();
+      if (progress.success) {
+        setAnswers(progress.answers);
+        setScore(progress.score);
+        
+        // Rebuild grid from saved answers
+        const newGrid = Array(14).fill(null).map(() => Array(19).fill(''));
+        const newCompletedWords = new Set<string>();
+        
+        Object.entries(progress.answers).forEach(([wordKey, answer]) => {
+          const clue = clues.find(c => `${c.number}-${c.direction}` === wordKey);
+          if (clue && answer.length === clue.length) {
+            // Fill grid with saved answer
+            for (let i = 0; i < clue.length; i++) {
+              const row = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
+              const col = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
+              newGrid[row][col] = answer[i];
+            }
+            newCompletedWords.add(wordKey);
+          }
+        });
+        
+        setGrid(newGrid);
+        setCompletedWords(newCompletedWords);
+        setLockedWords(newCompletedWords); // Treat saved completed words as locked
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadProgress();
+  }, [isAuthenticated]);
+
+  // Auto-save every 10 seconds
+  useEffect(() => {
+    if (!isAuthenticated || isLoading) return;
+
+    const autoSave = setInterval(async () => {
+      if (Object.keys(answers).length > 0) {
+        await saveCrosswordProgress(answers);
+      }
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(autoSave);
+  }, [answers, isAuthenticated, isLoading]);
 
   // Create a map of which cells belong to which words
   const cellToWords = new Map<string, CrosswordClue[]>();
@@ -155,10 +212,16 @@ const Level3Game = () => {
     answerArray[positionInWord] = newValue;
     
     const newAnswer = answerArray.join('');
-    setAnswers(prev => ({
-      ...prev,
+    const updatedAnswers = {
+      ...answers,
       [wordKey]: newAnswer
-    }));
+    };
+    setAnswers(updatedAnswers);
+    
+    // Auto-save on change (only save complete/partial words, not empty)
+    if (isAuthenticated && !isLoading && newAnswer.length > 0) {
+      saveCrosswordProgress(updatedAnswers);
+    }
 
     // Auto-advance to next cell if there's a value
     if (newValue && positionInWord < selectedWord.length - 1) {
@@ -213,11 +276,7 @@ const Level3Game = () => {
   };
 
   const handleNavigation = (path: string) => {
-    const hasProgress = Object.values(answers).some(answer => answer.length > 0);
-    if (hasProgress && completedWords.size < clues.length) {
-      setShowExitWarning(true);
-      return;
-    }
+    // No exit warning needed - auto-save handles progress
     window.location.href = path;
   };
 
@@ -226,12 +285,13 @@ const Level3Game = () => {
     window.location.href = path;
   };
 
-  const checkWord = () => {
-    if (!selectedWord) return;
+  const checkWord = async () => {
+    if (!selectedWord || isCheckingWord) return;
     
+    setIsCheckingWord(true);
     const wordKey = `${selectedWord.number}-${selectedWord.direction}`;
     
-    // Build the complete word from grid instead of answers object
+    // Build the complete word from grid
     let gridAnswer = '';
     for (let i = 0; i < selectedWord.length; i++) {
       const checkRow = selectedWord.direction === 'across' ? selectedWord.startRow : selectedWord.startRow + i;
@@ -239,14 +299,15 @@ const Level3Game = () => {
       gridAnswer += grid[checkRow][checkCol] || '';
     }
     
-    const isCorrect = gridAnswer.toUpperCase() === selectedWord.answer.toUpperCase();
+    // Validate with server
+    const result = await validateCrosswordWord(selectedWord.number, selectedWord.direction, gridAnswer);
     
-    console.log('Checking word:', wordKey);
-    console.log('Grid answer:', gridAnswer, 'length:', gridAnswer.length);
-    console.log('Expected answer:', selectedWord.answer, 'length:', selectedWord.answer.length);
-    console.log('Is correct:', isCorrect);
+    // Always update score from server (server knows the current total)
+    if (result.success && result.score !== undefined) {
+      setScore(result.score);
+    }
     
-    if (isCorrect && !completedWords.has(wordKey)) {
+    if (result.success && result.isCorrect && !completedWords.has(wordKey)) {
       setCompletedWords(prev => new Set([...prev, wordKey]));
       setCorrectWords(prev => new Set([...prev, wordKey]));
       setIncorrectWords(prev => {
@@ -255,16 +316,16 @@ const Level3Game = () => {
         return newSet;
       });
       
-      // Fill in the correct answer in the grid
-      const newGrid = [...grid];
-      for (let i = 0; i < selectedWord.length; i++) {
-        const fillRow = selectedWord.direction === 'across' ? selectedWord.startRow : selectedWord.startRow + i;
-        const fillCol = selectedWord.direction === 'across' ? selectedWord.startCol + i : selectedWord.startCol;
-        newGrid[fillRow][fillCol] = selectedWord.answer[i];
+      // Fill in the correct answer in the grid if we have it
+      if (result.correctAnswer) {
+        const newGrid = [...grid];
+        for (let i = 0; i < selectedWord.length; i++) {
+          const fillRow = selectedWord.direction === 'across' ? selectedWord.startRow : selectedWord.startRow + i;
+          const fillCol = selectedWord.direction === 'across' ? selectedWord.startCol + i : selectedWord.startCol;
+          newGrid[fillRow][fillCol] = result.correctAnswer[i];
+        }
+        setGrid(newGrid);
       }
-      setGrid(newGrid);
-      
-      setScore(prev => prev + 10);
       
       // Show green for 1 second, then lock to grey
       setTimeout(() => {
@@ -275,7 +336,7 @@ const Level3Game = () => {
         });
         setLockedWords(prev => new Set([...prev, wordKey]));
       }, 1000);
-    } else if (!isCorrect) {
+    } else if (result.success && !result.isCorrect) {
       // Mark as incorrect and clear the word
       setIncorrectWords(prev => new Set([...prev, wordKey]));
       setAnswers(prev => ({ ...prev, [wordKey]: '' }));
@@ -286,10 +347,10 @@ const Level3Game = () => {
         const clearRow = selectedWord.direction === 'across' ? selectedWord.startRow : selectedWord.startRow + i;
         const clearCol = selectedWord.direction === 'across' ? selectedWord.startCol + i : selectedWord.startCol;
         
-        // Check if this cell belongs to any locked word
+        // Check if this cell belongs to any locked OR completed word
         const cellWordsAtPosition = cellToWords.get(`${clearRow}-${clearCol}`) || [];
         const hasLockedWord = cellWordsAtPosition.some(word => 
-          lockedWords.has(`${word.number}-${word.direction}`) && 
+          (lockedWords.has(`${word.number}-${word.direction}`) || completedWords.has(`${word.number}-${word.direction}`)) && 
           `${word.number}-${word.direction}` !== wordKey
         );
         
@@ -309,79 +370,111 @@ const Level3Game = () => {
         });
       }, 2000);
     }
+    
+    setIsCheckingWord(false);
   };
 
-  const checkAll = () => {
-    let newCompletedWords = new Set(completedWords);
-    let newCorrectWords = new Set(correctWords);
-    let newIncorrectWords = new Set(incorrectWords);
-    let newScore = score;
-    let gridCopy = [...grid];
+  const checkAll = async () => {
+    if (isCheckingAll) return;
     
+    setIsCheckingAll(true);
+    
+    // Build current answers from grid
+    const currentAnswers: Record<string, string> = {};
     clues.forEach(clue => {
       const wordKey = `${clue.number}-${clue.direction}`;
-      
-      // Build the complete word from grid
       let gridAnswer = '';
       for (let i = 0; i < clue.length; i++) {
         const checkRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
         const checkCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
-        gridAnswer += gridCopy[checkRow][checkCol] || '';
+        gridAnswer += grid[checkRow][checkCol] || '';
       }
-      
-      const isCorrect = gridAnswer.toUpperCase() === clue.answer.toUpperCase();
-      
-      if (isCorrect && !completedWords.has(wordKey)) {
-        newCompletedWords.add(wordKey);
-        newCorrectWords.add(wordKey);
-        newScore += 10;
-        
-        // Fill in the complete answer
-        for (let i = 0; i < clue.length; i++) {
-          const fillRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
-          const fillCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
-          gridCopy[fillRow][fillCol] = clue.answer[i];
-        }
-      } else if (!isCorrect && gridAnswer.length > 0) {
-        // Mark as incorrect and clear
-        newIncorrectWords.add(wordKey);
-        setAnswers(prev => ({ ...prev, [wordKey]: '' }));
-        
-        // Clear grid cells for this word, preserving locked intersections
-        for (let i = 0; i < clue.length; i++) {
-          const clearRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
-          const clearCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
-          
-          const cellWordsAtPosition = cellToWords.get(`${clearRow}-${clearCol}`) || [];
-          const hasLockedWord = cellWordsAtPosition.some(word => 
-            newCompletedWords.has(`${word.number}-${word.direction}`) && 
-            `${word.number}-${word.direction}` !== wordKey
-          );
-          
-          if (!hasLockedWord) {
-            gridCopy[clearRow][clearCol] = '';
-          }
-        }
+      if (gridAnswer.length > 0) {
+        currentAnswers[wordKey] = gridAnswer;
       }
     });
     
-    setGrid(gridCopy);
-    setCompletedWords(newCompletedWords);
-    setCorrectWords(newCorrectWords);
-    setIncorrectWords(newIncorrectWords);
-    setScore(newScore);
+    // Validate all with server
+    const result = await validateCrosswordAll(currentAnswers);
     
-    // Show green for correct words, then lock them
-    setTimeout(() => {
-      setCorrectWords(new Set());
-      setLockedWords(prev => new Set([...prev, ...newCompletedWords]));
-    }, 1000);
+    if (result.success) {
+      let newCompletedWords = new Set(completedWords);
+      let newCorrectWords = new Set(correctWords);
+      let newIncorrectWords = new Set(incorrectWords);
+      let gridCopy = [...grid];
+      
+      // First pass: Process correct words and add them to newCompletedWords
+      Object.entries(result.results).forEach(([wordKey, isCorrect]) => {
+        if (isCorrect && !completedWords.has(wordKey)) {
+          newCompletedWords.add(wordKey);
+          newCorrectWords.add(wordKey);
+        }
+      });
+      
+      // Second pass: Process incorrect words, now with updated newCompletedWords
+      Object.entries(result.results).forEach(([wordKey, isCorrect]) => {
+        const clue = clues.find(c => `${c.number}-${c.direction}` === wordKey);
+        if (!clue) return;
+        
+        if (!isCorrect) {
+          newIncorrectWords.add(wordKey);
+          setAnswers(prev => ({ ...prev, [wordKey]: '' }));
+          
+          // Clear grid cells for this word, preserving ALL intersections
+          for (let i = 0; i < clue.length; i++) {
+            const clearRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
+            const clearCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
+            
+            const cellWordsAtPosition = cellToWords.get(`${clearRow}-${clearCol}`) || [];
+            const hasLockedWord = cellWordsAtPosition.some(word => 
+              (completedWords.has(`${word.number}-${word.direction}`) || 
+               lockedWords.has(`${word.number}-${word.direction}`) || 
+               newCompletedWords.has(`${word.number}-${word.direction}`)) && 
+              `${word.number}-${word.direction}` !== wordKey
+            );
+            
+            if (!hasLockedWord) {
+              gridCopy[clearRow][clearCol] = '';
+            }
+          }
+        }
+      });
+      
+      setGrid(gridCopy);
+      setCompletedWords(newCompletedWords);
+      setCorrectWords(newCorrectWords);
+      setIncorrectWords(newIncorrectWords);
+      setScore(result.score);
+      
+      // Show green for correct words, then lock them
+      setTimeout(() => {
+        setCorrectWords(new Set());
+        setLockedWords(prev => new Set([...prev, ...newCompletedWords]));
+      }, 1000);
+      
+      // Clear red highlighting for incorrect words
+      setTimeout(() => {
+        setIncorrectWords(new Set());
+      }, 2000);
+    }
     
-    // Clear red highlighting for incorrect words
-    setTimeout(() => {
-      setIncorrectWords(new Set());
-    }, 2000);
+    setIsCheckingAll(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl font-retro glow-cyan animate-pulse mb-4">
+            ⏳ LOADING CROSSWORD...
+          </div>
+          <div className="text-lg font-pixel glow-purple">
+            Restoring your progress
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -442,16 +535,17 @@ const Level3Game = () => {
         <div className="flex justify-center gap-4 mb-6">
           <Button
             onClick={checkWord}
-            disabled={!selectedWord}
+            disabled={!selectedWord || isCheckingWord}
             className="font-retro bg-neon-purple hover:bg-neon-pink"
           >
-            ✓ CHECK WORD
+            {isCheckingWord ? "⏳ CHECKING..." : "✓ CHECK WORD"}
           </Button>
           <Button
             onClick={checkAll}
+            disabled={isCheckingAll}
             className="font-retro bg-neon-cyan hover:bg-neon-purple"
           >
-            ✓ CHECK ALL
+            {isCheckingAll ? "⏳ CHECKING..." : "✓ CHECK ALL"}
           </Button>
         </div>
 
@@ -534,18 +628,34 @@ const Level3Game = () => {
         <div className="flex justify-center gap-4 mb-8">
           <Button
             onClick={checkWord}
-            disabled={!selectedWord}
+            disabled={!selectedWord || isCheckingWord}
             className="font-retro bg-neon-purple hover:bg-neon-pink"
           >
-            ✓ CHECK WORD
+            {isCheckingWord ? "⏳ CHECKING..." : "✓ CHECK WORD"}
           </Button>
           <Button
             onClick={checkAll}
+            disabled={isCheckingAll}
             className="font-retro bg-neon-cyan hover:bg-neon-purple"
           >
-            ✓ CHECK ALL
+            {isCheckingAll ? "⏳ CHECKING..." : "✓ CHECK ALL"}
           </Button>
         </div>
+
+        {/* Current Clue Display - Bottom */}
+        {selectedWord && (
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-4 bg-gradient-to-r from-neon-pink/20 to-neon-cyan/20 border-2 border-neon-pink rounded-full px-6 py-3 animate-pulse-border">
+              <span className="text-lg font-pixel glow-pink">
+                {selectedWord.number}-{selectedWord.direction.toUpperCase()}
+              </span>
+              <div className="text-lg font-retro glow-cyan">
+                {selectedWord.clue}
+              </div>
+              <span className="text-lg">({selectedWord.length} letters)</span>
+            </div>
+          </div>
+        )}
 
         {/* Clues Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-8">
@@ -635,14 +745,7 @@ const Level3Game = () => {
             🏠 HOME
           </Button>
           <Button
-            onClick={() => {
-              const hasProgress = Object.values(answers).some(answer => answer.length > 0);
-              if (hasProgress && completedWords.size < clues.length) {
-                setShowExitWarning(true);
-              } else {
-                logout();
-              }
-            }}
+            onClick={() => logout()}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-red text-neon-red hover:bg-neon-red/20"
@@ -651,36 +754,6 @@ const Level3Game = () => {
           </Button>
         </div>
 
-        {/* Exit Warning Modal */}
-        {showExitWarning && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
-            <Card className="max-w-md w-full p-6 bg-card/95 border-2 border-neon-red animate-pulse-border">
-              <div className="text-center">
-                <div className="text-4xl mb-4">⚠️</div>
-                <h3 className="text-xl font-retro glow-red mb-4">WAIT!</h3>
-                <p className="font-pixel text-sm mb-6">
-                  You have unsaved progress! Until you finish the challenge and submit your answers, your score won't be saved.
-                </p>
-                
-                <div className="flex gap-3 justify-center">
-                  <Button
-                    onClick={() => setShowExitWarning(false)}
-                    className="font-retro bg-neon-green hover:bg-neon-cyan"
-                  >
-                    🔄 CONTINUE PLAYING
-                  </Button>
-                  <Button
-                    onClick={() => confirmExit('/')}
-                    variant="outline"
-                    className="font-retro border-neon-red text-neon-red hover:bg-neon-red/20"
-                  >
-                    🚪 LEAVE ANYWAY
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -140,3 +140,178 @@ export const calculateLevel2Score = async (): Promise<{
     }
   }
 }
+
+// Validate single crossword word on server-side
+export const validateCrosswordWord = async (
+  clueNumber: number, 
+  direction: string, 
+  userAnswer: string
+): Promise<{ 
+  success: boolean; 
+  isCorrect: boolean; 
+  correctAnswer?: string;
+  score: number;
+  completedWords: number;
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('validate_crossword_word', { 
+        clue_number: clueNumber,
+        direction: direction,
+        user_answer: userAnswer,
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Server validation error:', error)
+      throw error
+    }
+    
+    return {
+      success: data.success,
+      isCorrect: data.is_correct,
+      correctAnswer: data.correct_answer,
+      score: data.score,
+      completedWords: data.completed_words
+    }
+
+  } catch (error: any) {
+    console.error('Error validating crossword word:', error)
+    return {
+      success: false,
+      isCorrect: false,
+      score: 0,
+      completedWords: 0,
+      error: error.message
+    }
+  }
+}
+
+// Validate all crossword answers on server-side
+export const validateCrosswordAll = async (userAnswers: Record<string, string>): Promise<{ 
+  success: boolean; 
+  results: Record<string, boolean>;
+  score: number;
+  completedWords: number;
+  perfectScore: boolean;
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('validate_crossword_all', { 
+        user_answers: userAnswers,
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Server validation error:', error)
+      throw error
+    }
+    
+    return {
+      success: data.success,
+      results: data.results,
+      score: data.score,
+      completedWords: data.completed_words,
+      perfectScore: data.perfect_score
+    }
+
+  } catch (error: any) {
+    console.error('Error validating all crossword answers:', error)
+    return {
+      success: false,
+      results: {},
+      score: 0,
+      completedWords: 0,
+      perfectScore: false,
+      error: error.message
+    }
+  }
+}
+
+// Save crossword progress (auto-save)
+export const saveCrosswordProgress = async (userAnswers: Record<string, string>): Promise<{ 
+  success: boolean; 
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('save_crossword_progress', { 
+        user_answers: userAnswers,
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Auto-save error:', error)
+      throw error
+    }
+    
+    return { success: true }
+
+  } catch (error: any) {
+    console.error('Error saving crossword progress:', error)
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
+// Load crossword progress
+export const getCrosswordProgress = async (): Promise<{ 
+  success: boolean; 
+  answers: Record<string, string>;
+  score: number;
+  completedWords: number;
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('get_crossword_progress', { 
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Load progress error:', error)
+      throw error
+    }
+    
+    return {
+      success: true,
+      answers: data.answers || {},
+      score: data.score || 0,
+      completedWords: data.completed_words || 0
+    }
+
+  } catch (error: any) {
+    console.error('Error loading crossword progress:', error)
+    return {
+      success: false,
+      answers: {},
+      score: 0,
+      completedWords: 0,
+      error: error.message
+    }
+  }
+}

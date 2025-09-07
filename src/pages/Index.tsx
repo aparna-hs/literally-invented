@@ -109,7 +109,7 @@ const Index = () => {
           </h1>
           
           <h2 className="text-2xl md:text-3xl font-retro mb-2 glow-cyan">
-            The Ultimate Colleague Discovery Game
+            The Ultimate SI Team Discovery Game
           </h2>
           
           <p className="text-lg font-pixel glow-purple mb-6">

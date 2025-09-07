@@ -474,12 +474,6 @@ const Level1Game = () => {
                 
                 <div className="mt-6 flex gap-4 justify-center">
                   <Button
-                    onClick={() => window.location.href = '/level2'}
-                    className="font-retro bg-neon-purple hover:bg-neon-pink"
-                  >
-                    ⏰ TIMELINE CHALLENGE
-                  </Button>
-                  <Button
                     onClick={() => window.location.href = '/'}
                     variant="outline"
                     className="font-retro border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"

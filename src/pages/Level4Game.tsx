@@ -377,7 +377,7 @@ const Level4Game = () => {
               📋 YOUR ANSWERS
             </h3>
             <div className="grid gap-3 max-h-96 overflow-y-auto">
-              {answeredStatements.map((statement, index) => (
+              {[...answeredStatements].reverse().map((statement, index) => (
                 <Card
                   key={`${statement.personId}-${statement.descriptionId}`}
                   className={`p-4 border-2 ${

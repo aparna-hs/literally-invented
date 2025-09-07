@@ -119,13 +119,6 @@ const Index = () => {
               
               <div className="w-full max-w-sm space-y-4">
                 <Button 
-                  onClick={() => window.location.href = '/level1'}
-                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
-                >
-                  🔍 SQUAD SCANNER
-                </Button>
-                
-                <Button 
                   onClick={() => window.location.href = '/level2'}
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-cyan to-neon-purple hover:from-neon-purple hover:to-neon-cyan"
                 >
@@ -133,10 +126,10 @@ const Index = () => {
                 </Button>
                 
                 <Button 
-                  onClick={() => window.location.href = '/level3'}
-                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-green to-neon-cyan hover:from-neon-cyan hover:to-neon-green"
+                  onClick={() => window.location.href = '/level1'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
                 >
-                  🧩 CROSSWORD CONQUEST
+                  🔍 SQUAD SCANNER
                 </Button>
                 
                 <Button 
@@ -144,6 +137,13 @@ const Index = () => {
                   className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-orange to-neon-purple hover:from-neon-purple hover:to-neon-orange"
                 >
                   🕵️ BLUFF BUSTER
+                </Button>
+                
+                <Button 
+                  onClick={() => window.location.href = '/level3'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-green to-neon-cyan hover:from-neon-cyan hover:to-neon-green"
+                >
+                  🧩 CROSSWORD CONQUEST
                 </Button>
                 
                 <Button 

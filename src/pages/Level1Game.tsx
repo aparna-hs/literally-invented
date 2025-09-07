@@ -246,16 +246,10 @@ const Level1Game = () => {
                 </div>
                 
                 <p className="font-pixel text-lg glow-purple mb-8">
-                  You can only play this challenge once! But don't worry - there are more challenges to explore! 🚀
+                  You can only play this challenge once! Great job learning more about team SI! 🔍
                 </p>
                 
                 <div className="flex gap-4 justify-center">
-                  <Button
-                    onClick={() => window.location.href = '/level2'}
-                    className="font-retro px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-pink hover:from-neon-pink hover:to-neon-purple"
-                  >
-                    ⏰ TIMELINE CHALLENGE
-                  </Button>
                   <Button
                     onClick={() => window.location.href = '/'}
                     variant="outline"

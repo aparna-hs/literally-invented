@@ -268,7 +268,7 @@ getBluffBusterProgress() -- Frontend function
 ```
 src/
 ├── pages/
-│   ├── Index.tsx - Home page with 4 challenges, no numbered levels
+│   ├── Index.tsx - Home page with 4 challenges, ordered by difficulty (easiest first)
 │   ├── Level1Game.tsx - SQUAD SCANNER (name-to-description matching)
 │   ├── Level2Game.tsx - TIMELINE TAKEDOWN (year sorting buckets)
 │   ├── Level3Game.tsx - CROSSWORD CONQUEST (interactive crossword)
@@ -532,5 +532,37 @@ get_bluff_buster_temp_score() - Temp score for leaderboard
 
 ---
 
+## ✅ Recent UX Improvements (2025-09-07)
+
+### Game Order & Flow Optimization
+- **Reordered homepage games by difficulty**: Timeline Takedown → Squad Scanner → Bluff Buster → Crossword Conquest
+- **Better progression**: From simple binary choices to complex puzzles, improving user retention
+- **Removed directional navigation**: All "already played" screens now show only HOME button for user choice
+
+### UI/UX Consistency Fixes
+- **Bluff Buster answer history**: Latest answers now appear at top (no scrolling needed)
+- **Squad Scanner consistency**: Results modal shows only HOME button (not Timeline button)
+- **Unified post-game experience**: All 4 challenges have identical completion flow
+- **Team-focused messaging**: Changed "Great job being a Squad Scanner" → "Great job learning more about team SI"
+
+### User Experience Benefits
+- ✅ **Better onboarding**: Easy games first, complex games last
+- ✅ **No forced progression**: Users choose their own path through challenges  
+- ✅ **Consistent interface**: All games follow same UI patterns
+- ✅ **Team building focus**: Messages emphasize learning about colleagues
+
+### Current Game Flow
+```
+Homepage (difficulty order):
+1. ⏰ TIMELINE TAKEDOWN (easiest - binary year choice)
+2. 🔍 SQUAD SCANNER (medium - name-description matching)  
+3. 🕵️ BLUFF BUSTER (medium-hard - personal fact detection)
+4. 🧩 CROSSWORD CONQUEST (hardest - intersecting clues)
+
+Post-completion: All games → Results modal → HOME button → User choice
+```
+
+---
+
 *This file contains the complete context of the Literally Invented project for future Claude sessions.*
-*Last Updated: 2025-09-07 - Added complete Bluff Buster game (Level 4)*
+*Last Updated: 2025-09-07 - UX improvements: game ordering, UI consistency, team-focused messaging*

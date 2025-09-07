@@ -14,6 +14,7 @@ const Index = () => {
   const [userTotalScore, setUserTotalScore] = useState<number>(0);
   const [completedChallenges, setCompletedChallenges] = useState<number>(0);
   const [loadingScore, setLoadingScore] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
 
   // Fetch user's total score when authenticated
@@ -86,6 +87,11 @@ const Index = () => {
 
       setUserTotalScore(totalScore);
       setCompletedChallenges(challengeCount);
+
+      // Show celebration if user completed all 4 games
+      if (challengeCount === 4) {
+        setShowCelebration(true);
+      }
     } catch (error) {
       console.error('Error fetching user score:', error);
     } finally {
@@ -294,6 +300,57 @@ const Index = () => {
         isOpen={showLeaderboard} 
         onClose={() => setShowLeaderboard(false)} 
       />
+
+      {/* All Games Completed Celebration Modal */}
+      {showCelebration && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-[120] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-lg w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-gradient-to-br from-neon-purple/20 to-neon-cyan/20 border-2 sm:border-4 border-neon-pink rounded-lg animate-pulse-border my-auto">
+            <div className="text-center">
+              <div className="text-4xl sm:text-6xl mb-4 animate-bounce">🏆</div>
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-retro font-black mb-3 glow-pink animate-pulse">
+                LEGENDARY!
+              </h1>
+              <h2 className="text-lg sm:text-2xl font-retro glow-cyan mb-4">
+                ULTIMATE SI TEAM EXPERT
+              </h2>
+              
+              <div className="bg-background/80 border-2 border-neon-green rounded-lg p-3 sm:p-4 mb-4">
+                <div className="text-3xl sm:text-5xl font-retro glow-green mb-2">
+                  {userTotalScore} POINTS
+                </div>
+                <p className="font-pixel text-sm sm:text-base text-neon-green glow-green">
+                  ALL 4 CHALLENGES CONQUERED! 🎮✨
+                </p>
+              </div>
+              
+              <div className="bg-neon-pink/10 border border-neon-pink/30 rounded-lg p-3 mb-4">
+                <p className="font-pixel text-xs sm:text-sm glow-pink animate-pulse">
+                  🌟 You've mastered every challenge in the SI Team Discovery Game! 🌟
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button
+                  onClick={() => setShowCelebration(false)}
+                  className="font-retro text-sm bg-gradient-to-r from-neon-pink to-neon-purple hover:from-neon-purple hover:to-neon-pink"
+                >
+                  🎉 BASK IN GLORY
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowCelebration(false);
+                    setShowLeaderboard(true);
+                  }}
+                  variant="outline"
+                  className="font-retro text-sm border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
+                >
+                  🏆 VIEW LEADERBOARD
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

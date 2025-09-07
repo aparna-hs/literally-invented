@@ -352,3 +352,128 @@ export const getLevel2Progress = async (): Promise<{
     }
   }
 }
+
+// Check single Bluff Buster answer and get immediate feedback
+export const checkSingleBluffAnswer = async (personId: string, descriptionId: string, userAnswer: boolean): Promise<{ 
+  isCorrect: boolean; 
+  success: boolean; 
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('check_single_bluff_answer', { 
+        person_id_param: personId,
+        description_id_param: descriptionId,
+        user_answer_param: userAnswer,
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Server check error:', error)
+      throw error
+    }
+    
+    console.log('Raw server response:', data, 'type:', typeof data);
+    
+    return {
+      success: true,
+      isCorrect: data === 1 || data === true || data === 'true' // Handle multiple formats
+    }
+
+  } catch (error: any) {
+    console.error('Error checking single bluff answer:', error)
+    return {
+      success: false,
+      isCorrect: false,
+      error: error.message
+    }
+  }
+}
+
+// Calculate final Bluff Buster score from all stored answers
+export const calculateBluffBusterScore = async (): Promise<{ 
+  score: number; 
+  correct_matches: number; 
+  total_questions: number; 
+  perfect_score: boolean; 
+  success: boolean; 
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .rpc('calculate_bluff_buster_score', { 
+        player_user_id: user.id
+      })
+
+    if (error) {
+      console.error('Server calculation error:', error)
+      throw error
+    }
+    
+    return {
+      success: true,
+      score: data.score,
+      correct_matches: data.correct_matches,
+      total_questions: data.total_questions,
+      perfect_score: data.perfect_score
+    }
+
+  } catch (error: any) {
+    console.error('Error calculating bluff buster score:', error)
+    return {
+      success: false,
+      score: 0,
+      correct_matches: 0,
+      total_questions: 0,
+      perfect_score: false,
+      error: error.message
+    }
+  }
+}
+
+// Get Bluff Buster progress with answers and results
+export const getBluffBusterProgress = async (): Promise<{ 
+  success: boolean; 
+  tempAnswers: { person_id: string; description_id: string; user_answer: boolean; is_correct: boolean }[];
+  error?: string 
+}> => {
+  try {
+    const user = getCurrentUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+    
+    const { data, error } = await supabase
+      .from('bluff_buster_temp_answers')
+      .select('person_id, description_id, user_answer, is_correct')
+      .eq('user_id', user.id)
+
+    if (error) {
+      console.error('Error fetching bluff buster progress:', error)
+      throw error
+    }
+    
+    return {
+      success: true,
+      tempAnswers: data || []
+    }
+
+  } catch (error: any) {
+    console.error('Error getting Bluff Buster progress:', error)
+    return {
+      success: false,
+      tempAnswers: [],
+      error: error.message
+    }
+  }
+}

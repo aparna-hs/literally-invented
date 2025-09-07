@@ -7,9 +7,10 @@
 - ✅ **SQUAD SCANNER**: Name-to-description matching game (17 people) - COMPLETE with server validation, one-time play, custom exit warnings
 - ✅ **TIMELINE TAKEDOWN**: Year sorting bucket game (18 people) - COMPLETE with server validation, auto-save progress, one-time play
 - ✅ **CROSSWORD CONQUEST**: Interactive crossword puzzle (12 words) - COMPLETE with server validation, auto-save progress, intersection logic
+- ✅ **BLUFF BUSTER**: FACT/BLUFF detection game (13 people) - COMPLETE with server validation, auto-save progress, one-time play
 - ✅ Supabase authentication with custom login system - WORKING
 - ✅ Server-side answer validation with automatic score saving - WORKING
-- ✅ Auto-save functionality for Timeline and Crossword challenges - WORKING
+- ✅ Auto-save functionality for Timeline, Crossword, and Bluff Buster challenges - WORKING
 - ✅ Leaderboard displays total scores + temp scores - WORKING
 - ✅ Security: All answers hidden from frontend, validated on server
 - ✅ Anti-cheating measures: One-time play restrictions, server-side validation
@@ -81,6 +82,24 @@ crossword_answers (
   correct_answer text,
   PRIMARY KEY (clue_number, direction)
 )
+
+-- bluff_buster_answers table (Level 4 - IMPLEMENTED)
+bluff_buster_answers (
+  id SERIAL PRIMARY KEY,
+  person_id TEXT NOT NULL,
+  description_id TEXT NOT NULL,
+  true_false BOOLEAN NOT NULL -- true for FACT, false for BLUFF
+)
+
+-- bluff_buster_temp_answers table (Level 4 - IMPLEMENTED)
+bluff_buster_temp_answers (
+  user_id INTEGER NOT NULL,
+  person_id TEXT NOT NULL,
+  description_id TEXT NOT NULL,
+  user_answer BOOLEAN NOT NULL, -- user's choice: true=FACT, false=BLUFF
+  is_correct BOOLEAN NOT NULL,
+  PRIMARY KEY (user_id, person_id, description_id)
+)
 ```
 
 ### Database Functions
@@ -136,6 +155,28 @@ get_level2_temp_score(player_user_id INTEGER)
 -- Process: Counts correct answers from level2_temp_answers, multiplies by 10
 -- Output: INTEGER (temp score for partial Level 2 progress)
 -- Usage: Used by leaderboard to include temp scores for users with partial Timeline progress
+
+-- Level 4: Bluff Buster validation functions (IMPLEMENTED)
+check_single_bluff_answer(person_id_param TEXT, description_id_param TEXT, user_answer_param BOOLEAN, player_user_id INTEGER)
+-- Input: person_id, description_id, user's FACT/BLUFF choice, user_id
+-- Process: Validates single answer against bluff_buster_answers, stores in temp table
+-- Output: 1 (correct) or 0 (incorrect)
+
+calculate_bluff_buster_score(player_user_id INTEGER)
+-- Input: user_id
+-- Process: Counts correct answers from temp table, saves final score, cleans up temp data
+-- Output: {score: integer, correct_matches: integer, total_questions: integer, perfect_score: boolean}
+
+get_bluff_buster_temp_score(player_user_id INTEGER)
+-- Input: user_id
+-- Process: Counts correct answers from bluff_buster_temp_answers, multiplies by 10
+-- Output: INTEGER (temp score for partial Bluff Buster progress)
+-- Usage: Used by leaderboard to include temp scores for users with partial Bluff Buster progress
+
+getBluffBusterProgress() -- Frontend function
+-- Input: current user (from auth context)
+-- Process: Loads temp answers from bluff_buster_temp_answers table
+-- Output: {success: boolean, tempAnswers: [{person_id, description_id, user_answer, is_correct}]}
 ```
 
 ## 👥 Team Members 
@@ -183,6 +224,23 @@ get_level2_temp_score(player_user_id INTEGER)
 18. Varun
 ```
 
+### Level 4: FACT/BLUFF Detection Game (13 people)
+```
+1. Jidnesh (JD) ↔ "football fan and is writing an autobiography"
+2. Mohammed (Mo) ↔ "loves baking and watching F1"
+3. Mark ↔ "Has been a part of Hollywood movie crew"
+4. Daniella (Dani) ↔ "Has met the Queen of England and Rishi Sunak in a span of one week"
+5. Leigh ↔ "If not travelling, love to practise ballet and ceramic crafts"
+6. Charles ↔ "Can speak 5 sentences in Hindi"
+7. Nishtha ↔ "loves to play cricket and chess"
+8. Suraj ↔ "Always watches FRIENDS when eating"
+9. Ted ↔ "Plays golf as well as soccer"
+10. Jaymin ↔ "Has a graduate degree in Political Science"
+11. Aparna ↔ "Has read one Harry Potter Book in espanol"
+12. Laissa ↔ "Can fluently converse in 5 languages"
+13. Prerna ↔ "Can binge watch Naruto on repeat"
+```
+
 ### Descriptions and IDs
 ```
 44: "Co-founded a magazine and was a football (soccer) columnist, Manchester United fan"
@@ -210,10 +268,11 @@ get_level2_temp_score(player_user_id INTEGER)
 ```
 src/
 ├── pages/
-│   ├── Index.tsx - Home page with 3 challenges, no numbered levels
-│   ├── Level1Game.tsx - KNOW YOUR CREW (name-to-description matching)
-│   ├── Level2Game.tsx - TIMELINE CHALLENGE (year sorting buckets)
-│   └── Level3Game.tsx - CROSSWORD CHALLENGE (interactive crossword)
+│   ├── Index.tsx - Home page with 4 challenges, no numbered levels
+│   ├── Level1Game.tsx - SQUAD SCANNER (name-to-description matching)
+│   ├── Level2Game.tsx - TIMELINE TAKEDOWN (year sorting buckets)
+│   ├── Level3Game.tsx - CROSSWORD CONQUEST (interactive crossword)
+│   └── Level4Game.tsx - BLUFF BUSTER (FACT/BLUFF detection)
 ├── components/
 │   ├── LoginForm.tsx - Custom authentication form
 │   └── Leaderboard.tsx - Shows total scores across levels
@@ -240,11 +299,12 @@ interface Description { id: string; text: string; emoji: string; }
 ```
 
 ### Scoring System
-- **KNOW YOUR CREW**: 10 points per correct match (max 170 points)
-- **TIMELINE CHALLENGE**: 10 points per correct year placement (max 180 points)  
-- **CROSSWORD CHALLENGE**: 10 points per correct word (max 120 points) - frontend only, server integration pending
-- **Leaderboard**: Sum of best scores across all challenges per user
-- **Server validation**: Answers checked securely, scores saved automatically
+- **SQUAD SCANNER**: 10 points per correct match (max 170 points)
+- **TIMELINE TAKEDOWN**: 10 points per correct year placement (max 180 points)  
+- **CROSSWORD CONQUEST**: 10 points per correct word (max 120 points)
+- **BLUFF BUSTER**: 10 points per correct FACT/BLUFF detection (max 130 points)
+- **Leaderboard**: Sum of best scores across all challenges per user + temp scores for partial progress
+- **Server validation**: All answers checked securely, scores saved automatically
 
 ## 🔐 Authentication System
 ```typescript
@@ -425,5 +485,52 @@ git push        # Auto-deploys to Vercel
 
 ---
 
+---
+
+## ✅ Recent Addition: Bluff Buster Game (2025-09-07)
+
+### New Game Implementation
+- **🕵️ BLUFF BUSTER**: Complete FACT/BLUFF detection game added as Level 4
+- **Game Mechanics**: One-by-one statement presentation, FACT/BLUFF choice buttons, immediate feedback
+- **Team Focus**: 13 SI team members with personalized statements about each person
+- **Scoring**: 10 points per correct detection (max 130 points)
+
+### Technical Implementation
+```typescript
+// Game Structure: Similar to Timeline Takedown pattern
+- Auto-save progress during gameplay
+- Server-side validation with immediate feedback  
+- One-time play restriction when completed
+- Progress restoration from temp answers table
+- Custom SI-focused result messages
+```
+
+### Backend Structure
+```sql
+-- New Tables Added:
+bluff_buster_answers (person_id, description_id, true_false)
+bluff_buster_temp_answers (user_id, person_id, description_id, user_answer, is_correct)
+
+-- New Functions Added:
+check_single_bluff_answer() - Individual answer validation
+calculate_bluff_buster_score() - Final scoring and cleanup  
+get_bluff_buster_temp_score() - Temp score for leaderboard
+```
+
+### UI Features
+- **Retro Gaming Theme**: Consistent with other challenges
+- **Team-Specific Messages**: "SI folks are trickier", "know the entire team inside out"
+- **Progress Tracking**: Live score and completion percentage
+- **Answer History**: Shows all previous answers with ✅/❌ feedback
+- **Leaderboard Integration**: Includes both completed and temp scores
+
+### Key Benefits
+- ✅ **Team Building**: Encourages learning fun facts about colleagues
+- ✅ **Engaging Gameplay**: Simple but addictive FACT/BLUFF mechanics
+- ✅ **Complete Feature Parity**: Same functionality as other games
+- ✅ **Scalable Pattern**: Easy to add more statements or people
+
+---
+
 *This file contains the complete context of the Literally Invented project for future Claude sessions.*
-*Last Updated: 2025-09-07 - Completed leaderboard temp scores functionality*
+*Last Updated: 2025-09-07 - Added complete Bluff Buster game (Level 4)*

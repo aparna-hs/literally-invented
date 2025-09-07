@@ -140,6 +140,13 @@ const Index = () => {
                 </Button>
                 
                 <Button 
+                  onClick={() => window.location.href = '/level4'}
+                  className="w-full font-retro text-lg py-6 bg-gradient-to-r from-neon-orange to-neon-purple hover:from-neon-purple hover:to-neon-orange"
+                >
+                  🕵️ BLUFF BUSTER
+                </Button>
+                
+                <Button 
                   onClick={logout}
                   variant="outline"
                   className="w-full font-pixel text-sm py-3 border-neon-red text-neon-red hover:bg-neon-red/20"

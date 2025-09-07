@@ -28,20 +28,39 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
     setLoading(true)
     try {
       // 1. Get unique user_ids from temp answers and their temp scores
-      const { data: tempAnswers } = await supabase
+      // Level 2 (Timeline Takedown) temp scores
+      const { data: level2TempAnswers } = await supabase
         .from('level2_temp_answers')
         .select('user_id')
       
-      const tempUserIds = tempAnswers ? [...new Set(tempAnswers.map(t => t.user_id))] : []
+      const level2TempUserIds = level2TempAnswers ? [...new Set(level2TempAnswers.map(t => t.user_id))] : []
       const tempScoresByUser = new Map<number, number>()
       
-      for (const userId of tempUserIds) {
+      for (const userId of level2TempUserIds) {
         const { data: tempScore } = await supabase
           .rpc('get_level2_temp_score', { 
             player_user_id: userId 
           })
         if (tempScore > 0) {
           tempScoresByUser.set(userId, tempScore)
+        }
+      }
+
+      // Level 4 (Bluff Buster) temp scores
+      const { data: level4TempAnswers } = await supabase
+        .from('bluff_buster_temp_answers')
+        .select('user_id')
+      
+      const level4TempUserIds = level4TempAnswers ? [...new Set(level4TempAnswers.map(t => t.user_id))] : []
+      
+      for (const userId of level4TempUserIds) {
+        const { data: tempScore } = await supabase
+          .rpc('get_bluff_buster_temp_score', { 
+            player_user_id: userId 
+          })
+        if (tempScore > 0) {
+          const existing = tempScoresByUser.get(userId) || 0
+          tempScoresByUser.set(userId, existing + tempScore)
         }
       }
 

@@ -73,14 +73,6 @@ const Level1Game = () => {
 
   const [showExitWarning, setShowExitWarning] = useState(false);
 
-  // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      window.location.href = '/';
-      return;
-    }
-  }, [isAuthenticated]);
-
   const handleNavigation = (path: string) => {
     if (!isSubmitted && Object.keys(matches).length > 0) {
       setShowExitWarning(true);

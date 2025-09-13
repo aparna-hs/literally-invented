@@ -85,14 +85,6 @@ const Level3Game = () => {
     Array(14).fill(null).map(() => Array(19).fill(null))
   );
 
-  // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      window.location.href = '/';
-      return;
-    }
-  }, [isAuthenticated]);
-
   // Load saved progress on component mount
   useEffect(() => {
     const loadProgress = async () => {

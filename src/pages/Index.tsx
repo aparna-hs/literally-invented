@@ -168,6 +168,9 @@ const Index = () => {
                       <div className="bg-neon-cyan/10 border border-neon-cyan/30 rounded p-3">
                         <strong className="text-neon-cyan">⚡ SCORING:</strong> Earn 10 points per correct answer, build your total score
                       </div>
+                      <div className="bg-neon-orange/10 border border-neon-orange/30 rounded p-3">
+                        <strong className="text-neon-orange">🎯 ONE-TIME PLAY:</strong> Each challenge can only be completed once. Once you finish a challenge, you cannot replay it
+                      </div>
                       <div className="bg-neon-pink/10 border border-neon-pink/30 rounded p-3">
                         <strong className="text-neon-pink">🏆 WIN CONDITION:</strong> Complete challenges and top the leaderboard to become the Ultimate SI Team Expert!
                       </div>

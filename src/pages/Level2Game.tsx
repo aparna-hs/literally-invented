@@ -52,6 +52,14 @@ const Level2Game = () => {
   
   const { isAuthenticated } = useAuth();
 
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      window.location.href = '/';
+      return;
+    }
+  }, [isAuthenticated]);
+
   const handleNavigation = (path: string) => {
     // No exit warning needed - progress auto-saved to database
     window.location.href = path;

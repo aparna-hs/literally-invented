@@ -41,14 +41,14 @@ const Level1Game = () => {
 
   const descriptions: Description[] = [
     { id: "44", text: "Co-founded a magazine and was a football (soccer) columnist, Manchester United fan", emoji: "⚽" },
-    { id: "57", text: "From the south of France, has studied & worked in Finland, Australia, New Zealand, likes knitting, outdoor sports, live music", emoji: "🇫🇷" },
+    { id: "57", text: "From the south of France, has studied & worked in Finland, Australia, New Zealand, UK, likes knitting, outdoor sports, live music", emoji: "🇫🇷" },
     { id: "32", text: "A cricket fan, plays online games", emoji: "🏏" },
     { id: "42", text: "Loves fashion, dancing, and her cat", emoji: "💃" },
     { id: "31", text: "Likes hikes, treks, and gardening", emoji: "🥾" },
     { id: "61", text: "Plays Chess & Table Tennis", emoji: "♟️" },
     { id: "22", text: "Gamer, graphic design is his passion", emoji: "🎮" },
     { id: "36", text: "Born & raised in Jamaica, is the youngest of all his siblings, mountain biker, a NY'er who moved to Connecticut, one of the few people in the world to do an actual negative flight", emoji: "🇯🇲" },
-    { id: "73", text: "Analytics queen", emoji: "📊" },
+    { id: "73", text: "Analytics queen, only colleague located in the unique location where East meets West!", emoji: "📊" },
     { id: "34", text: "Wanted to be a pilot - was in training to become a fighter pilot cadet for the Indian Air Force", emoji: "✈️" },
     { id: "75", text: "Powerpoint wizard, is a DJ", emoji: "🎧" },
     { id: "46", text: "From Miami, loves basketball (Go Heat), loves Drake", emoji: "🏀" },
@@ -56,7 +56,7 @@ const Level1Game = () => {
     { id: "56", text: "Ice hockey player, loves live music", emoji: "🏒" },
     { id: "80", text: "Is really into biohacking, gymnastics & weightlifting, has 2 dogs & 2 cats", emoji: "🤸" },
     { id: "35", text: "Grew up in different cities of northern india, master skills in pottery", emoji: "🏺" },
-    { id: "77", text: "Bachelors degree in Pyschology and loves going to converts and camping", emoji: "🏕️" }
+    { id: "77", text: "Bachelors degree in Psychology and loves going to concerts and camping", emoji: "🏕️" }
   ];
 
   const [matches, setMatches] = useState<Record<string, string>>({});

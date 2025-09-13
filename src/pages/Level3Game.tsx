@@ -22,26 +22,26 @@ const Level3Game = () => {
   const clues: CrosswordClue[] = [
     // Row 0: 1-across (4 letters), 2-down starts from last letter of 1-across
     { number: 1, direction: 'across', clue: "Went on vacation to Mauritius this year", startRow: 0, startCol: 3, length: 4 },
-    { number: 2, direction: 'down', clue: "Mr. Event Coordinator", startRow: 0, startCol: 6, length: 5 },
+    { number: 2, direction: 'down', clue: "Mr. Event Coordinator for Gurgaon location", startRow: 0, startCol: 6, length: 5 },
     
     // Row 4: 3-across intersects with 2-down at row 4, col 6
-    { number: 3, direction: 'across', clue: "Into Music Production", startRow: 4, startCol: 4, length: 5 },
+    { number: 3, direction: 'across', clue: "Love, life and creates music", startRow: 4, startCol: 4, length: 5 },
     { number: 3, direction: 'down', clue: "Bollywood Music Lover", startRow: 4, startCol: 4, length: 5 },
     
     // Row 7: 4-across starts from 4th letter of 3-down
-    { number: 4, direction: 'across', clue: "Innovation Award Winner", startRow: 7, startCol: 4, length: 7 },
+    { number: 4, direction: 'across', clue: "Governance colleague who is an innovation award winner as well as won ED Gilligan Award Winner", startRow: 7, startCol: 4, length: 7 },
     
     // 5-down starts from 6th letter of 4-across
     { number: 5, direction: 'down', clue: "a Delhite who Plays Guitar", startRow: 7, startCol: 9, length: 5 },
     
     // 9-across where 5th letter intersects with 3rd letter of 5-down
-    { number: 9, direction: 'across', clue: "Got married in February", startRow: 9, startCol: 5, length: 7 },
+    { number: 9, direction: 'across', clue: "Got married this February", startRow: 9, startCol: 5, length: 7 },
     
     // 9-down
     { number: 9, direction: 'down', clue: "Son graduated HS this year", startRow: 9, startCol: 5, length: 4 },
     
     // 8-down - 3rd letter is 1st of 10-across, 5th letter is 1st of 12-across
-    { number: 8, direction: 'down', clue: "Can't disclose due to privacy issues :P", startRow: 8, startCol: 0, length: 6 },
+    { number: 8, direction: 'down', clue: "Great scuba driver, but can't disclose due to privacy issues :P", startRow: 8, startCol: 0, length: 6 },
     
     // 10-across - last letter matches 2nd letter of 9-down
     { number: 10, direction: 'across', clue: "Selfie Queen!", startRow: 10, startCol: 0, length: 6 },
@@ -53,7 +53,7 @@ const Level3Game = () => {
     { number: 7, direction: 'down', clue: "The Leader. The Fighter. The Inspiration", startRow: 7, startCol: 15, length: 6 },
     
     // 11-across - first letter matches last letter of 5-down
-    { number: 11, direction: 'across', clue: "Getting married in December", startRow: 11, startCol: 9, length: 7 },
+    { number: 11, direction: 'across', clue: "Getting married this December", startRow: 11, startCol: 9, length: 7 },
     
     // 12-across - last letter matches last letter of 9-down
     { number: 12, direction: 'across', clue: "Table Tennis Wizard", startRow: 12, startCol: 0, length: 6 }

@@ -311,7 +311,7 @@ const Index = () => {
             <div className="text-center">
               <div className="text-4xl sm:text-6xl mb-4 animate-bounce">🏆</div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl font-retro font-black mb-3 glow-pink animate-pulse">
-                LEGENDARY!
+                SLAY!
               </h1>
               <h2 className="text-lg sm:text-2xl font-retro glow-cyan mb-4">
                 ULTIMATE SI TEAM EXPERT

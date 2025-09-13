@@ -787,7 +787,7 @@ const Level3Game = () => {
                     {finalScore} POINTS
                   </div>
                   <p className="font-pixel text-sm text-gray-300">
-                    All 14 words conquered!
+                    Completed: {new Date().toLocaleDateString()}
                   </p>
                 </div>
                 

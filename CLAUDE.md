@@ -18,7 +18,15 @@
 - ✅ Social media optimization with custom OG image and meta tags
 - ✅ Deployed on Vercel: https://literally-invented.vercel.app/
 
-## 🔧 Recent Major Updates (2025-09-07)
+## 🔧 Recent Major Updates (2025-09-13)
+
+### Content Updates and Bug Fixes
+- **Squad Scanner content updates** - Enhanced descriptions with geographic details, typo fixes
+- **Crossword clues refresh** - Updated clues to be more current and detailed
+- **Game rules enhancement** - Added one-time play restriction rule with clear explanation
+- **Leaderboard cleanup** - Removed meaningless "Last played" dates that always showed current date
+- **Celebration text modernization** - Changed from "LEGENDARY!" to "SLAY!" for all-games completion
+- **Completion modal consistency** - All games now show completion date instead of mixed formats
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only
@@ -33,7 +41,7 @@
 - **Fixed score display bug** - Already completed crossword now shows actual database score instead of 0
 
 ### Ultimate Champion Celebration System
-- **All Games Completed Celebration** - Special "LEGENDARY!" modal for users who complete all 4 games
+- **All Games Completed Celebration** - Special "SLAY!" modal for users who complete all 4 games
 - **Auto-trigger on homepage** - Shows automatically when user has completedChallenges === 4
 - **Responsive modal design** - Fits properly on all screen sizes with scrolling if needed
 - **Retro celebration theme** - Trophy emoji, neon colors, animations, "ULTIMATE SI TEAM EXPERT" title
@@ -53,4 +61,22 @@
 - **Retro-themed completion** - Celebration popups with neon styling and animations
 - **Database-first approach** - All scores come from database, never set in frontend state
 
-[Rest of the file remains unchanged]
+## 🐛 Known Issues & Open Bugs
+
+### Browser Back Button Authentication Bypass
+**Status:** 🔴 Open Issue  
+**Priority:** Medium  
+**Description:** After logout, users can press browser back button to navigate to game pages. While server calls fail (no authentication), the pages still load and display content, creating a confusing UX.
+
+**Attempted Fix:** Added useEffect authentication guards to redirect unauthenticated users to homepage, but the implementation didn't work as expected and was reverted.
+
+**Impact:** 
+- Users see game pages but can't actually play or save progress
+- Confusing experience when server calls fail silently
+- Not a security issue (server properly validates auth), but poor UX
+
+**Next Steps:** Need to investigate proper React routing guards or authentication middleware approach.
+
+---
+
+## 🗂️ Project Architecture

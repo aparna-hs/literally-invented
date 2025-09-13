@@ -6,7 +6,6 @@ interface LeaderboardEntry {
   user_id: number
   display_name: string
   total_score: number
-  last_played: string
 }
 
 interface LeaderboardProps {
@@ -126,8 +125,7 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
         leaderboardEntries.push({
           user_id: userId,
           display_name: user?.display_name || 'Unknown',
-          total_score: totalScore,
-          last_played: new Date().toISOString()
+          total_score: totalScore
         })
       })
 
@@ -205,9 +203,6 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
                         <div>
                           <div className="font-retro text-lg glow-cyan">
                             {entry.display_name}
-                          </div>
-                          <div className="font-pixel text-xs text-gray-400">
-                            Last played: {new Date(entry.last_played).toLocaleDateString()}
                           </div>
                         </div>
                       </div>

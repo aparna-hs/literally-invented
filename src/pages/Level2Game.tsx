@@ -86,6 +86,7 @@ const Level2Game = () => {
         // User has partial progress - rebuild buckets from saved answers
         const answeredSet = new Set(progress.tempAnswers.map(a => a.player_id.toString()));
         setAlreadyAnswered(answeredSet);
+        setAnsweredCount(progress.tempAnswers.length); // Set count from database
         
         // Rebuild buckets from temp answers
         const new2024: Colleague[] = [];
@@ -140,7 +141,7 @@ const Level2Game = () => {
     }
   };
 
-  const [userAnswers, setUserAnswers] = useState<Record<string, number>>({});
+  const [answeredCount, setAnsweredCount] = useState(0);
 
   const handleDropToBucket = async (year: number) => {
     if (!currentName || isGameComplete) return;
@@ -151,6 +152,9 @@ const Level2Game = () => {
     const result = await checkSingleLevel2Answer(currentName.id, year);
     
     console.log('Server result:', result);
+    
+    // Update progress count (same approach as score)
+    setAnsweredCount(prev => prev + 1);
     
     // Add to bucket with server validation result
     const droppedColleague = { 
@@ -316,7 +320,7 @@ const Level2Game = () => {
             <div className="text-center">
               <div className="text-lg font-retro glow-cyan">PROGRESS</div>
               <div className="text-2xl font-pixel text-neon-green">
-                {userAnswers ? Object.keys(userAnswers).length : 0}/{colleagues.length}
+                {answeredCount}/{colleagues.length}
               </div>
             </div>
           </div>

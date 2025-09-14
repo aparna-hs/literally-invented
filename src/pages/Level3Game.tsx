@@ -72,8 +72,6 @@ const Level3Game = () => {
   const [lockedWords, setLockedWords] = useState<Set<string>>(new Set());
   const [incorrectWords, setIncorrectWords] = useState<Set<string>>(new Set());
   const [correctWords, setCorrectWords] = useState<Set<string>>(new Set());
-  const [showExitWarning, setShowExitWarning] = useState(false);
-  const [exitAction, setExitAction] = useState<'home' | 'logout'>('home');
   const [isCheckingWord, setIsCheckingWord] = useState(false);
   // isCheckingAll removed - no longer needed
   const [isLoading, setIsLoading] = useState(true);
@@ -312,44 +310,10 @@ const Level3Game = () => {
   };
 
   const handleNavigation = (path: string) => {
-    // Check if user has unsaved progress (letters in grid but not checked)
-    let hasUnsavedProgress = false;
-    clues.forEach(clue => {
-      const wordKey = `${clue.number}-${clue.direction}`;
-      let gridAnswer = '';
-      for (let i = 0; i < clue.length; i++) {
-        const checkRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
-        const checkCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
-        gridAnswer += grid[checkRow][checkCol] || '';
-      }
-      // If there's text in grid but word is not locked (saved), it's unsaved
-      if (gridAnswer.length > 0 && !lockedWords.has(wordKey)) {
-        hasUnsavedProgress = true;
-      }
-    });
-
-    if (hasUnsavedProgress) {
-      setExitAction('home');
-      setShowExitWarning(true);
-      return;
-    }
+    // Navigate directly - progress is saved via Check Word
     window.location.href = path;
   };
 
-  const saveProgressOnExit = async () => {
-    // No longer auto-saving on exit since Check All is removed
-    // Progress is only saved via Check Word clicks
-    console.log('Exiting without auto-save - progress saved via Check Word only');
-  };
-
-  const confirmExit = (action: 'home' | 'logout') => {
-    setShowExitWarning(false);
-    if (action === 'logout') {
-      logout();
-    } else {
-      window.location.href = '/';
-    }
-  };
 
   const checkWord = async () => {
     if (!selectedWord || isCheckingWord) return;
@@ -639,7 +603,7 @@ const Level3Game = () => {
         )}
 
         {/* Check Button - Bottom */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-4">
           <Button
             onClick={checkWord}
             disabled={!selectedWord || isCheckingWord}
@@ -647,6 +611,15 @@ const Level3Game = () => {
           >
             {isCheckingWord ? "⏳ CHECKING..." : "✓ CHECK WORD"}
           </Button>
+        </div>
+
+        {/* Save Progress Tip - Bottom */}
+        <div className="text-center mb-8">
+          <div className="inline-block bg-neon-cyan/10 border border-neon-cyan/30 rounded-lg p-3 max-w-md">
+            <p className="font-pixel text-sm text-neon-cyan">
+              💾 Click "CHECK WORD" to save your progress for each completed word
+            </p>
+          </div>
         </div>
 
         {/* Clues Section */}
@@ -738,29 +711,7 @@ const Level3Game = () => {
             🏠 HOME
           </Button>
           <Button
-            onClick={() => {
-              // Check for unsaved progress before logout
-              let hasUnsavedProgress = false;
-              clues.forEach(clue => {
-                const wordKey = `${clue.number}-${clue.direction}`;
-                let gridAnswer = '';
-                for (let i = 0; i < clue.length; i++) {
-                  const checkRow = clue.direction === 'across' ? clue.startRow : clue.startRow + i;
-                  const checkCol = clue.direction === 'across' ? clue.startCol + i : clue.startCol;
-                  gridAnswer += grid[checkRow][checkCol] || '';
-                }
-                if (gridAnswer.length > 0 && !lockedWords.has(wordKey)) {
-                  hasUnsavedProgress = true;
-                }
-              });
-
-              if (hasUnsavedProgress) {
-                setExitAction('logout');
-                setShowExitWarning(true);
-              } else {
-                logout();
-              }
-            }}
+            onClick={() => logout()}
             variant="outline"
             size="sm"
             className="font-pixel border-neon-red text-neon-red hover:bg-neon-red/20"
@@ -823,36 +774,6 @@ const Level3Game = () => {
           </div>
         )}
 
-        {/* Exit Warning Modal */}
-        {showExitWarning && (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
-            <Card className="max-w-md w-full p-6 bg-card/95 border-2 border-neon-red animate-pulse-border">
-              <div className="text-center">
-                <div className="text-4xl mb-4">⚠️</div>
-                <h3 className="text-xl font-retro glow-red mb-4">UNSAVED PROGRESS!</h3>
-                <p className="font-pixel text-sm mb-6">
-                  If you have words filled in the crossword that haven't been checked and saved yet, use "CHECK WORD" to save your progress before leaving.
-                </p>
-                
-                <div className="flex gap-3 justify-center">
-                  <Button
-                    onClick={() => setShowExitWarning(false)}
-                    className="font-retro bg-neon-green hover:bg-neon-cyan"
-                  >
-                    🔄 CONTINUE PLAYING
-                  </Button>
-                  <Button
-                    onClick={() => confirmExit(exitAction)}
-                    variant="outline"
-                    className="font-retro border-neon-red text-neon-red hover:bg-neon-red/20"
-                  >
-                    🚪 LEAVE ANYWAY
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
 
       </div>
     </div>

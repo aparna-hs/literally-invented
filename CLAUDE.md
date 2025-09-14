@@ -29,6 +29,8 @@
 - **Completion modal consistency** - All games now show completion date instead of mixed formats
 - **Timeline Takedown progress fix** - Fixed progress counter that always showed 0/18, now correctly tracks answered questions
 - **Squad Scanner correct answers** - Added inline display of correct answers for wrong matches, shows right next to descriptions
+- **Crossword save tip enhancement** - Added duplicate save tip below Check Word button for better visibility
+- **Crossword exit warning removal** - Removed confusing unsaved progress popup since progress is saved via Check Word button
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only

@@ -27,6 +27,8 @@
 - **Leaderboard cleanup** - Removed meaningless "Last played" dates that always showed current date
 - **Celebration text modernization** - Changed from "LEGENDARY!" to "SLAY!" for all-games completion
 - **Completion modal consistency** - All games now show completion date instead of mixed formats
+- **Timeline Takedown progress fix** - Fixed progress counter that always showed 0/18, now correctly tracks answered questions
+- **Squad Scanner correct answers** - Added inline display of correct answers for wrong matches, shows right next to descriptions
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only

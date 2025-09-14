@@ -310,7 +310,12 @@ const Level1Game = () => {
               const matchedName = getMatchedName(description.id);
               // Check if the person matched to this description got it correct
               const matchedPersonId = matches[description.id];
-              const isCorrect = matchedPersonId ? validationResult?.results?.[matchedPersonId] : false;
+              const isCorrect = matchedPersonId ? validationResult?.results?.[matchedPersonId]?.is_correct : false;
+              
+              // Find the correct person for this description
+              const correctPersonId = Object.keys(validationResult?.results || {}).find(personId => 
+                validationResult.results[personId].correct_answer === description.id
+              );
               const showResult = isSubmitted && validationResult;
               
               return (
@@ -337,6 +342,13 @@ const Level1Game = () => {
                           </span>
                         )}
                       </div>
+                      
+                      {/* Show correct answer if user got it wrong */}
+                      {showResult && !isCorrect && correctPersonId && (
+                        <div className="text-xs text-green-400 ml-8 mt-1">
+                          ✓ Correct: {colleagues.find(c => c.id === correctPersonId)?.name}
+                        </div>
+                      )}
                     </div>
                     
                     <div 

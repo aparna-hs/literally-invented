@@ -753,15 +753,6 @@ const Level3Game = () => {
                 
                 <div className="flex gap-4 justify-center">
                   <Button
-                    onClick={() => {
-                      setShowCompletionModal(false);
-                      window.location.href = '/';
-                    }}
-                    className="font-retro bg-neon-cyan hover:bg-neon-purple"
-                  >
-                    🏠 RETURN HOME
-                  </Button>
-                  <Button
                     onClick={() => setShowCompletionModal(false)}
                     variant="outline"
                     className="font-retro border-neon-pink text-neon-pink hover:bg-neon-pink/20"

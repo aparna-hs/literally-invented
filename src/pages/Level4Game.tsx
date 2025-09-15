@@ -467,11 +467,11 @@ const Level4Game = () => {
                 
                 <div className="mt-6 flex gap-4 justify-center">
                   <Button
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => setShowResultsModal(false)}
                     variant="outline"
-                    className="font-retro border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20"
+                    className="font-retro border-neon-pink text-neon-pink hover:bg-neon-pink/20"
                   >
-                    🏠 HOME
+                    🕵️ ANALYZE FINDINGS
                   </Button>
                 </div>
               </div>

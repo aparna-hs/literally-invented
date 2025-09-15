@@ -32,6 +32,8 @@
 - **Crossword save tip enhancement** - Added duplicate save tip below Check Word button for better visibility
 - **Crossword exit warning removal** - Removed confusing unsaved progress popup since progress is saved via Check Word button
 - **Timeline Takedown scoring update** - Changed from 10 to 5 points per correct answer (updated frontend and database)
+- **Game rules scoring update** - Updated rules to show correct point values: Timeline (5 pts), Squad Scanner & Bluff Buster (10 pts), Crossword (15 pts) per correct answer
+- **Results modal improvements** - Replaced home buttons with quirky review buttons to encourage users to view their answers: Timeline ("⏰ REVIEW TIMELINE"), Squad Scanner ("🔍 SCAN RESULTS"), Bluff Buster ("🕵️ ANALYZE FINDINGS"), and Crossword keeps ("🧩 ADMIRE CROSSWORD")
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only

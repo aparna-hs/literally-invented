@@ -31,6 +31,7 @@
 - **Squad Scanner correct answers** - Added inline display of correct answers for wrong matches, shows right next to descriptions
 - **Crossword save tip enhancement** - Added duplicate save tip below Check Word button for better visibility
 - **Crossword exit warning removal** - Removed confusing unsaved progress popup since progress is saved via Check Word button
+- **Timeline Takedown scoring update** - Changed from 10 to 5 points per correct answer (updated frontend and database)
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only

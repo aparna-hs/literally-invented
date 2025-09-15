@@ -117,7 +117,7 @@ const Level2Game = () => {
         setBucket2024(new2024);
         setBucket2025(new2025);
         setCorrectCount(correctCount);
-        setScore(correctCount * 10); // 10 points per correct answer
+        setScore(correctCount * 5); // 5 points per correct answer
         
         const unanswered = colleagues.filter(c => !answeredSet.has(c.id));
         const shuffled = unanswered.sort(() => Math.random() - 0.5);
@@ -171,7 +171,7 @@ const Level2Game = () => {
     
     // Update score immediately if correct
     if (result.isCorrect) {
-      setScore(prev => prev + 10);
+      setScore(prev => prev + 5);
       setCorrectCount(prev => prev + 1);
     }
     

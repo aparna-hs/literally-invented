@@ -166,7 +166,7 @@ const Index = () => {
                     
                     <div className="border-t border-neon-purple/30 pt-4 space-y-3">
                       <div className="bg-neon-cyan/10 border border-neon-cyan/30 rounded p-3">
-                        <strong className="text-neon-cyan">⚡ SCORING:</strong> Earn 10 points per correct answer, build your total score
+                        <strong className="text-neon-cyan">⚡ SCORING (per correct answer):</strong> Timeline Takedown: 5 pts • Squad Scanner & Bluff Buster: 10 pts • Crossword: 15 pts
                       </div>
                       <div className="bg-neon-orange/10 border border-neon-orange/30 rounded p-3">
                         <strong className="text-neon-orange">🎯 ONE-TIME PLAY:</strong> Each challenge can only be completed once. Once you finish a challenge, you cannot replay it

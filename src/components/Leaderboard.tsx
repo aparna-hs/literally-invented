@@ -6,6 +6,7 @@ interface LeaderboardEntry {
   user_id: number
   display_name: string
   total_score: number
+  completed_levels: number
 }
 
 interface LeaderboardProps {
@@ -97,13 +98,18 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
         .from('scores')
         .select('user_id, score')
 
-      // 3. Add up scores by user_id
+      // 3. Add up scores by user_id and track completed levels
       const totalScoresByUser = new Map<number, number>()
+      const completedLevelsByUser = new Map<number, number>()
       
-      // Add completed scores
+      // Add completed scores and count completed levels
       completedScores?.forEach((entry: any) => {
         const existing = totalScoresByUser.get(entry.user_id) || 0
         totalScoresByUser.set(entry.user_id, existing + entry.score)
+        
+        // Count completed levels per user
+        const existingLevels = completedLevelsByUser.get(entry.user_id) || 0
+        completedLevelsByUser.set(entry.user_id, existingLevels + 1)
       })
 
       // Add temp scores
@@ -122,10 +128,12 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
       
       totalScoresByUser.forEach((totalScore, userId) => {
         const user = allUsers?.find(u => u.id === userId)
+        const completedLevels = completedLevelsByUser.get(userId) || 0
         leaderboardEntries.push({
           user_id: userId,
           display_name: user?.display_name || 'Unknown',
-          total_score: totalScore
+          total_score: totalScore,
+          completed_levels: completedLevels
         })
       })
 
@@ -203,6 +211,9 @@ const Leaderboard = ({ isOpen, onClose }: LeaderboardProps) => {
                         <div>
                           <div className="font-retro text-lg glow-cyan">
                             {entry.display_name}
+                          </div>
+                          <div className="font-pixel text-xs text-gray-400">
+                            {entry.completed_levels}/4 levels completed
                           </div>
                         </div>
                       </div>

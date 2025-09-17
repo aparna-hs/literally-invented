@@ -15,6 +15,10 @@ const Index = () => {
   const [completedChallenges, setCompletedChallenges] = useState<number>(0);
   const [loadingScore, setLoadingScore] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState<boolean | null>(null);
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
 
   // Fetch user's total score when authenticated
@@ -91,11 +95,52 @@ const Index = () => {
       // Show celebration if user completed all 4 games
       if (challengeCount === 4) {
         setShowCelebration(true);
+        
+        // Check if user has already given feedback
+        const { data: existingFeedback } = await supabase
+          .from('feedback')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        
+        // Show feedback section if no existing feedback
+        if (!existingFeedback) {
+          setShowFeedback(true);
+        }
       }
     } catch (error) {
       console.error('Error fetching user score:', error);
     } finally {
       setLoadingScore(false);
+    }
+  };
+
+  const submitFeedback = async () => {
+    if (!user || feedbackRating === null) return;
+    
+    setSubmittingFeedback(true);
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .insert({
+          user_id: user.id,
+          rating: feedbackRating,
+          comment: feedbackComment.trim() || null
+        });
+
+      if (error) {
+        console.error('Error submitting feedback:', error);
+        return;
+      }
+
+      // Hide feedback section after successful submission
+      setShowFeedback(false);
+      setFeedbackRating(null);
+      setFeedbackComment('');
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -242,6 +287,67 @@ const Index = () => {
                   Choose your challenge and prove your team knowledge
                 </p>
               </div>
+
+              {/* Feedback Section - Show only for completed users who haven't given feedback */}
+              {showFeedback && completedChallenges === 4 && (
+                <div className="w-full max-w-sm mb-6">
+                  <div className="bg-background/70 border-2 border-neon-pink rounded-lg p-4 animate-pulse-border">
+                    <h3 className="text-lg font-retro glow-pink text-center mb-3">
+                      🌟 RATE LITERALLY INVENTED
+                    </h3>
+                    <p className="font-pixel text-xs text-center text-gray-300 mb-4">
+                      How was your SI Team Discovery experience?
+                    </p>
+                    
+                    {/* Rating Buttons */}
+                    <div className="flex gap-4 justify-center mb-4">
+                      <Button
+                        onClick={() => setFeedbackRating(true)}
+                        className={`font-retro px-6 py-3 ${
+                          feedbackRating === true 
+                            ? 'bg-neon-green border-neon-green' 
+                            : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
+                        }`}
+                        variant="outline"
+                      >
+                        👍 LOVED IT
+                      </Button>
+                      <Button
+                        onClick={() => setFeedbackRating(false)}
+                        className={`font-retro px-6 py-3 ${
+                          feedbackRating === false 
+                            ? 'bg-neon-green border-neon-green' 
+                            : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
+                        }`}
+                        variant="outline"
+                      >
+                        👎 MEH
+                      </Button>
+                    </div>
+                    
+                    {/* Optional Comment */}
+                    <textarea
+                      value={feedbackComment}
+                      onChange={(e) => setFeedbackComment(e.target.value)}
+                      placeholder="Any additional thoughts? (optional)"
+                      className="w-full p-3 bg-background/50 border border-neon-cyan/30 rounded text-sm font-pixel text-white placeholder-gray-400 resize-none"
+                      rows={3}
+                      maxLength={500}
+                    />
+                    
+                    {/* Submit Button */}
+                    <div className="mt-4">
+                      <Button
+                        onClick={submitFeedback}
+                        disabled={feedbackRating === null || submittingFeedback}
+                        className="w-full font-retro bg-neon-purple hover:bg-neon-pink"
+                      >
+                        {submittingFeedback ? '⏳ SUBMITTING...' : '✨ SUBMIT FEEDBACK'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="w-full max-w-sm space-y-4">
                 <Button 

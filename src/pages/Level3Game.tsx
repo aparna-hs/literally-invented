@@ -29,7 +29,7 @@ const Level3Game = () => {
     { number: 3, direction: 'down', clue: "Bollywood Music Lover", startRow: 4, startCol: 4, length: 5 },
     
     // Row 7: 4-across starts from 4th letter of 3-down
-    { number: 4, direction: 'across', clue: "Governance colleague who is an innovation award winner as well as won ED Gilligan Award Winner", startRow: 7, startCol: 4, length: 7 },
+    { number: 4, direction: 'across', clue: "Governance colleague who won ED Gilligan Award", startRow: 7, startCol: 4, length: 7 },
     
     // 5-down starts from 6th letter of 4-across
     { number: 5, direction: 'down', clue: "a Delhite who Plays Guitar", startRow: 7, startCol: 9, length: 5 },

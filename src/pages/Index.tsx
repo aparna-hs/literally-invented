@@ -20,6 +20,8 @@ const Index = () => {
   const [feedbackComment, setFeedbackComment] = useState('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackGivenInModal, setFeedbackGivenInModal] = useState(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [updatingComment, setUpdatingComment] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
 
   // Fetch user's total score when authenticated
@@ -116,6 +118,66 @@ const Index = () => {
     }
   };
 
+  // Auto-submit rating immediately when selected
+  const submitInitialRating = async (rating: boolean) => {
+    if (!user) return;
+    
+    setSubmittingFeedback(true);
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .insert({
+          user_id: user.id,
+          rating: rating,
+          comment: null // No comment initially
+        });
+
+      if (error) {
+        console.error('Error submitting initial rating:', error);
+        return;
+      }
+
+      setRatingSubmitted(true);
+      setFeedbackRating(rating);
+    } catch (error) {
+      console.error('Error submitting initial rating:', error);
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  };
+
+  // Update feedback with comment
+  const updateFeedbackWithComment = async () => {
+    if (!user || !ratingSubmitted) return;
+    
+    setUpdatingComment(true);
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .update({ 
+          comment: feedbackComment.trim() || null 
+        })
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating feedback comment:', error);
+        return;
+      }
+
+      // Complete the feedback process
+      setFeedbackGivenInModal(true);
+      setShowFeedback(false);
+      setFeedbackRating(null);
+      setFeedbackComment('');
+      setRatingSubmitted(false);
+    } catch (error) {
+      console.error('Error updating feedback comment:', error);
+    } finally {
+      setUpdatingComment(false);
+    }
+  };
+
+  // Legacy function for homepage feedback (keep existing behavior)
   const submitFeedback = async (fromModal = false) => {
     if (!user || feedbackRating === null) return;
     
@@ -297,59 +359,78 @@ const Index = () => {
               {showFeedback && completedChallenges === 4 && (
                 <div className="w-full max-w-sm mb-6">
                   <div className="bg-background/70 border-2 border-neon-pink rounded-lg p-4 animate-pulse-border">
-                    <h3 className="text-lg font-retro glow-pink text-center mb-3">
-                      🌟 RATE LITERALLY INVENTED
-                    </h3>
-                    <p className="font-pixel text-xs text-center text-gray-300 mb-4">
-                      How was your SI Team Discovery experience?
-                    </p>
-                    
-                    {/* Rating Buttons */}
-                    <div className="flex gap-4 justify-center mb-4">
-                      <Button
-                        onClick={() => setFeedbackRating(true)}
-                        className={`font-retro px-6 py-3 ${
-                          feedbackRating === true 
-                            ? 'bg-neon-green border-neon-green' 
-                            : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
-                        }`}
-                        variant="outline"
-                      >
-                        👍 LOVED IT
-                      </Button>
-                      <Button
-                        onClick={() => setFeedbackRating(false)}
-                        className={`font-retro px-6 py-3 ${
-                          feedbackRating === false 
-                            ? 'bg-neon-green border-neon-green' 
-                            : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
-                        }`}
-                        variant="outline"
-                      >
-                        👎 MEH
-                      </Button>
-                    </div>
-                    
-                    {/* Optional Comment */}
-                    <textarea
-                      value={feedbackComment}
-                      onChange={(e) => setFeedbackComment(e.target.value)}
-                      placeholder="Any additional thoughts? (optional)"
-                      className="w-full p-3 bg-background/50 border border-neon-cyan/30 rounded text-sm font-pixel text-white placeholder-gray-400 resize-none"
-                      rows={3}
-                      maxLength={500}
-                    />
-                    
-                    {/* Submit Button */}
-                    <div className="mt-4">
-                      <Button
-                        onClick={submitFeedback}
-                        disabled={feedbackRating === null || submittingFeedback}
-                        className="w-full font-retro bg-neon-purple hover:bg-neon-pink"
-                      >
-                        {submittingFeedback ? '⏳ SUBMITTING...' : '✨ SUBMIT FEEDBACK'}
-                      </Button>
-                    </div>
+                    {!ratingSubmitted ? (
+                      <>
+                        <h3 className="text-lg font-retro glow-pink text-center mb-3">
+                          🌟 RATE LITERALLY INVENTED
+                        </h3>
+                        <p className="font-pixel text-xs text-center text-gray-300 mb-4">
+                          How was your SI Team Discovery experience?
+                        </p>
+                        
+                        {/* Rating Buttons */}
+                        <div className="flex gap-4 justify-center mb-4">
+                          <Button
+                            onClick={() => submitInitialRating(true)}
+                            disabled={submittingFeedback}
+                            className="font-retro px-6 py-3 bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20"
+                            variant="outline"
+                          >
+                            {submittingFeedback ? '⏳ SUBMITTING...' : '👍 LOVED IT'}
+                          </Button>
+                          <Button
+                            onClick={() => submitInitialRating(false)}
+                            disabled={submittingFeedback}
+                            className="font-retro px-6 py-3 bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20"
+                            variant="outline"
+                          >
+                            {submittingFeedback ? '⏳ SUBMITTING...' : '👎 MEH'}
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-center mb-4">
+                          <div className="text-sm text-neon-green mb-2">
+                            ✅ Rating saved! {feedbackRating ? '👍' : '👎'}
+                          </div>
+                          <h3 className="text-lg font-retro glow-pink">
+                            Want to add a comment?
+                          </h3>
+                          <p className="font-pixel text-xs text-gray-300 mt-2">
+                            Share any additional thoughts (optional)
+                          </p>
+                        </div>
+                        
+                        {/* Optional Comment */}
+                        <textarea
+                          value={feedbackComment}
+                          onChange={(e) => setFeedbackComment(e.target.value)}
+                          placeholder="Your thoughts help us improve..."
+                          className="w-full p-3 bg-background/50 border border-neon-cyan/30 rounded text-sm font-pixel text-white placeholder-gray-400 resize-none mb-4"
+                          rows={3}
+                          maxLength={500}
+                        />
+                        
+                        {/* Action Buttons */}
+                        <div className="flex gap-3">
+                          <Button
+                            onClick={updateFeedbackWithComment}
+                            disabled={updatingComment}
+                            className="flex-1 font-retro bg-neon-purple hover:bg-neon-pink"
+                          >
+                            {updatingComment ? '⏳ UPDATING...' : '💬 ADD COMMENT'}
+                          </Button>
+                          <Button
+                            onClick={() => setShowFeedback(false)}
+                            className="font-retro border-gray-500 text-gray-400 hover:bg-gray-500/20"
+                            variant="outline"
+                          >
+                            SKIP
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -446,57 +527,79 @@ const Index = () => {
               {/* Feedback Section in Modal */}
               {!feedbackGivenInModal && showFeedback && (
                 <div className="bg-background/60 border border-neon-cyan/30 rounded-lg p-4 mb-4">
-                  <h3 className="text-sm font-retro glow-cyan text-center mb-3">
-                    💫 How was your experience?
-                  </h3>
-                  
-                  {/* Rating Buttons */}
-                  <div className="flex gap-3 justify-center mb-3">
-                    <Button
-                      onClick={() => setFeedbackRating(true)}
-                      className={`font-retro px-4 py-2 text-xs ${
-                        feedbackRating === true 
-                          ? 'bg-neon-green border-neon-green' 
-                          : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
-                      }`}
-                      variant="outline"
-                      size="sm"
-                    >
-                      👍 LOVED IT
-                    </Button>
-                    <Button
-                      onClick={() => setFeedbackRating(false)}
-                      className={`font-retro px-4 py-2 text-xs ${
-                        feedbackRating === false 
-                          ? 'bg-neon-green border-neon-green' 
-                          : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
-                      }`}
-                      variant="outline"
-                      size="sm"
-                    >
-                      👎 MEH
-                    </Button>
-                  </div>
-                  
-                  {/* Optional Comment */}
-                  <textarea
-                    value={feedbackComment}
-                    onChange={(e) => setFeedbackComment(e.target.value)}
-                    placeholder="Quick thoughts? (optional)"
-                    className="w-full p-2 bg-background/50 border border-neon-cyan/30 rounded text-xs font-pixel text-white placeholder-gray-400 resize-none mb-3"
-                    rows={2}
-                    maxLength={300}
-                  />
-                  
-                  {/* Submit Button */}
-                  <Button
-                    onClick={() => submitFeedback(true)}
-                    disabled={feedbackRating === null || submittingFeedback}
-                    className="w-full font-retro text-xs bg-neon-purple hover:bg-neon-pink"
-                    size="sm"
-                  >
-                    {submittingFeedback ? '⏳ SUBMITTING...' : '✨ SUBMIT FEEDBACK'}
-                  </Button>
+                  {!ratingSubmitted ? (
+                    <>
+                      <h3 className="text-sm font-retro glow-cyan text-center mb-3">
+                        💫 How was your experience?
+                      </h3>
+                      
+                      {/* Rating Buttons */}
+                      <div className="flex gap-3 justify-center mb-3">
+                        <Button
+                          onClick={() => submitInitialRating(true)}
+                          disabled={submittingFeedback}
+                          className="font-retro px-4 py-2 text-xs bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20"
+                          variant="outline"
+                          size="sm"
+                        >
+                          {submittingFeedback ? '⏳' : '👍 LOVED IT'}
+                        </Button>
+                        <Button
+                          onClick={() => submitInitialRating(false)}
+                          disabled={submittingFeedback}
+                          className="font-retro px-4 py-2 text-xs bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20"
+                          variant="outline"
+                          size="sm"
+                        >
+                          {submittingFeedback ? '⏳' : '👎 MEH'}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-center mb-3">
+                        <div className="text-xs text-neon-green mb-2">
+                          ✅ Rating saved! {feedbackRating ? '👍' : '👎'}
+                        </div>
+                        <h3 className="text-sm font-retro glow-cyan">
+                          Want to add a comment?
+                        </h3>
+                      </div>
+                      
+                      {/* Optional Comment */}
+                      <textarea
+                        value={feedbackComment}
+                        onChange={(e) => setFeedbackComment(e.target.value)}
+                        placeholder="Share your thoughts... (optional)"
+                        className="w-full p-2 bg-background/50 border border-neon-cyan/30 rounded text-xs font-pixel text-white placeholder-gray-400 resize-none mb-3"
+                        rows={2}
+                        maxLength={300}
+                      />
+                      
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={updateFeedbackWithComment}
+                          disabled={updatingComment}
+                          className="flex-1 font-retro text-xs bg-neon-purple hover:bg-neon-pink"
+                          size="sm"
+                        >
+                          {updatingComment ? '⏳ UPDATING...' : '💬 ADD COMMENT'}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setFeedbackGivenInModal(true);
+                            setShowFeedback(false);
+                          }}
+                          className="font-retro text-xs border-gray-500 text-gray-400 hover:bg-gray-500/20"
+                          variant="outline"
+                          size="sm"
+                        >
+                          SKIP
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
               

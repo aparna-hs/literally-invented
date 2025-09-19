@@ -19,6 +19,7 @@ const Index = () => {
   const [feedbackRating, setFeedbackRating] = useState<boolean | null>(null);
   const [feedbackComment, setFeedbackComment] = useState('');
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackGivenInModal, setFeedbackGivenInModal] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
 
   // Fetch user's total score when authenticated
@@ -103,7 +104,7 @@ const Index = () => {
           .eq('user_id', user.id)
           .single();
         
-        // Show feedback section if no existing feedback
+        // Show feedback section if no existing feedback in database
         if (!existingFeedback) {
           setShowFeedback(true);
         }
@@ -115,7 +116,7 @@ const Index = () => {
     }
   };
 
-  const submitFeedback = async () => {
+  const submitFeedback = async (fromModal = false) => {
     if (!user || feedbackRating === null) return;
     
     setSubmittingFeedback(true);
@@ -137,6 +138,10 @@ const Index = () => {
       setShowFeedback(false);
       setFeedbackRating(null);
       setFeedbackComment('');
+      
+      if (fromModal) {
+        setFeedbackGivenInModal(true);
+      }
     } catch (error) {
       console.error('Error submitting feedback:', error);
     } finally {
@@ -437,6 +442,71 @@ const Index = () => {
                   🌟 You've mastered every challenge in the SI Team Discovery Game! 🌟
                 </p>
               </div>
+              
+              {/* Feedback Section in Modal */}
+              {!feedbackGivenInModal && showFeedback && (
+                <div className="bg-background/60 border border-neon-cyan/30 rounded-lg p-4 mb-4">
+                  <h3 className="text-sm font-retro glow-cyan text-center mb-3">
+                    💫 How was your experience?
+                  </h3>
+                  
+                  {/* Rating Buttons */}
+                  <div className="flex gap-3 justify-center mb-3">
+                    <Button
+                      onClick={() => setFeedbackRating(true)}
+                      className={`font-retro px-4 py-2 text-xs ${
+                        feedbackRating === true 
+                          ? 'bg-neon-green border-neon-green' 
+                          : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
+                      }`}
+                      variant="outline"
+                      size="sm"
+                    >
+                      👍 LOVED IT
+                    </Button>
+                    <Button
+                      onClick={() => setFeedbackRating(false)}
+                      className={`font-retro px-4 py-2 text-xs ${
+                        feedbackRating === false 
+                          ? 'bg-neon-green border-neon-green' 
+                          : 'bg-transparent border-neon-green text-neon-green hover:bg-neon-green/20'
+                      }`}
+                      variant="outline"
+                      size="sm"
+                    >
+                      👎 MEH
+                    </Button>
+                  </div>
+                  
+                  {/* Optional Comment */}
+                  <textarea
+                    value={feedbackComment}
+                    onChange={(e) => setFeedbackComment(e.target.value)}
+                    placeholder="Quick thoughts? (optional)"
+                    className="w-full p-2 bg-background/50 border border-neon-cyan/30 rounded text-xs font-pixel text-white placeholder-gray-400 resize-none mb-3"
+                    rows={2}
+                    maxLength={300}
+                  />
+                  
+                  {/* Submit Button */}
+                  <Button
+                    onClick={() => submitFeedback(true)}
+                    disabled={feedbackRating === null || submittingFeedback}
+                    className="w-full font-retro text-xs bg-neon-purple hover:bg-neon-pink"
+                    size="sm"
+                  >
+                    {submittingFeedback ? '⏳ SUBMITTING...' : '✨ SUBMIT FEEDBACK'}
+                  </Button>
+                </div>
+              )}
+              
+              {feedbackGivenInModal && (
+                <div className="bg-neon-green/10 border border-neon-green/30 rounded-lg p-3 mb-4">
+                  <p className="font-pixel text-xs text-center text-neon-green">
+                    ✅ Thanks for your feedback!
+                  </p>
+                </div>
+              )}
               
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button

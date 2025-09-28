@@ -34,6 +34,11 @@
 - **Timeline Takedown scoring update** - Changed from 10 to 5 points per correct answer (updated frontend and database)
 - **Game rules scoring update** - Updated rules to show correct point values: Timeline (5 pts), Squad Scanner & Bluff Buster (10 pts), Crossword (15 pts) per correct answer
 - **Results modal improvements** - Replaced home buttons with quirky review buttons to encourage users to view their answers: Timeline ("⏰ REVIEW TIMELINE"), Squad Scanner ("🔍 SCAN RESULTS"), Bluff Buster ("🕵️ ANALYZE FINDINGS"), and Crossword keeps ("🧩 ADMIRE CROSSWORD")
+- **Leaderboard enhancement** - Added completed levels count (X/4 levels completed) under player names to show progress alongside scores
+- **Crossword clue refinement** - Simplified 4-across clue from redundant wording to cleaner "Governance colleague who won ED Gilligan Award"
+- **Comprehensive feedback system** - Added user feedback collection for completed players with thumbs up/down rating and optional comments, appears in celebration modal for immediate engagement
+- **Two-stage feedback UX** - Implemented auto-submit on rating selection to eliminate user confusion, with optional comment stage and clear progression feedback
+- **Universal feedback collection** - Modified feedback system to show on homepage for ALL authenticated users who haven't given feedback yet, regardless of completion status (for final week collection)
 
 ### Crossword Challenge Complete Overhaul
 - **Removed Check All functionality** - Simplified to individual word checking only
@@ -54,6 +59,14 @@
 - **Retro celebration theme** - Trophy emoji, neon colors, animations, "ULTIMATE SI TEAM EXPERT" title
 - **Total score showcase** - Displays cumulative points with "ALL 4 CHALLENGES CONQUERED!" message
 - **Action buttons** - "BASK IN GLORY" to dismiss, "VIEW LEADERBOARD" to see rankings (properly linked)
+
+### User Feedback Collection System
+- **Dual-location feedback** - Feedback appears both in celebration modal (immediate engagement) and homepage (fallback for users who skip modal)
+- **Two-stage submission process** - Auto-submits rating immediately when thumbs up/down clicked, then optional comment stage with clear progression
+- **Universal display logic** - Shows for ALL authenticated users who haven't given feedback yet, regardless of completion status (updated for final week collection)
+- **Encouragement without pressure** - Comments are clearly optional with skip option, users get immediate "Rating saved!" confirmation
+- **Database structure** - Stores user_id, rating (boolean), optional comment, and timestamp with unique constraint per user
+- **UX optimization** - Eliminates confusion about whether feedback was submitted, matches user expectations of modern like/dislike systems
 
 ### Social Media Optimization
 - **Custom Open Graph meta tags** - Replaced Lovable defaults with "Literally Invented" branding

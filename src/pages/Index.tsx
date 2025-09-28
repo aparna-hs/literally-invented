@@ -98,18 +98,18 @@ const Index = () => {
       // Show celebration if user completed all 4 games
       if (challengeCount === 4) {
         setShowCelebration(true);
-        
-        // Check if user has already given feedback
-        const { data: existingFeedback } = await supabase
-          .from('feedback')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
-        
-        // Show feedback section if no existing feedback in database
-        if (!existingFeedback) {
-          setShowFeedback(true);
-        }
+      }
+
+      // Check if user has already given feedback (for all users, not just completed)
+      const { data: existingFeedback } = await supabase
+        .from('feedback')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      // Show feedback section if no existing feedback in database
+      if (!existingFeedback) {
+        setShowFeedback(true);
       }
     } catch (error) {
       console.error('Error fetching user score:', error);
@@ -355,8 +355,8 @@ const Index = () => {
                 </p>
               </div>
 
-              {/* Feedback Section - Show only for completed users who haven't given feedback */}
-              {showFeedback && completedChallenges === 4 && (
+              {/* Feedback Section - Show for all users who haven't given feedback */}
+              {showFeedback && (
                 <div className="w-full max-w-sm mb-6">
                   <div className="bg-background/70 border-2 border-neon-pink rounded-lg p-4 animate-pulse-border">
                     {!ratingSubmitted ? (

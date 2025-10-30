@@ -39,7 +39,7 @@ const Level4Game = () => {
     { id: "7", name: "Nishtha" },
     { id: "8", name: "Suraj" },
     { id: "9", name: "Ted" },
-    { id: "10", name: "Jaymin" },
+    { id: "10", name: "Nandini" },
     { id: "11", name: "Aparna" },
     { id: "12", name: "Laissa" },
     { id: "13", name: "Prerna" }
@@ -56,7 +56,7 @@ const Level4Game = () => {
     { id: "21", text: "loves to play cricket and chess" },
     { id: "19", text: "Always watches FRIENDS when eating" },
     { id: "39", text: "Plays golf as well as soccer" },
-    { id: "47", text: "Has a graduate degree in Political Science" },
+    { id: "47", text: "Started Amex career as a CCP" },
     { id: "35", text: "Has read one Harry Potter Book in espanol" },
     { id: "32", text: "Can fluently converse in 5 languages" },
     { id: "41", text: "Can binge watch Naruto on repeat" }
@@ -73,7 +73,7 @@ const Level4Game = () => {
     { personId: "7", descriptionId: "21", personName: "Nishtha", statement: "loves to play cricket and chess" },
     { personId: "8", descriptionId: "19", personName: "Suraj", statement: "Always watches FRIENDS when eating" },
     { personId: "9", descriptionId: "39", personName: "Ted", statement: "Plays golf as well as soccer" },
-    { personId: "10", descriptionId: "47", personName: "Jaymin", statement: "Has a graduate degree in Political Science" },
+    { personId: "10", descriptionId: "47", personName: "Nandini", statement: "Started Amex career as a CCP" },
     { personId: "11", descriptionId: "35", personName: "Aparna", statement: "Has read one Harry Potter Book in espanol" },
     { personId: "12", descriptionId: "32", personName: "Laissa", statement: "Can fluently converse in 5 languages" },
     { personId: "13", descriptionId: "41", personName: "Prerna", statement: "Can binge watch Naruto on repeat" }

@@ -18,19 +18,51 @@ jobs:
           const { chromium } = require('playwright');
           (async () => {
             try {
+              console.log('🚀 Launching browser...');
               const browser = await chromium.launch();
               const page = await browser.newPage();
+              
+              console.log('📡 Navigating to https://literally-invented.vercel.app/...');
               await page.goto('https://literally-invented.vercel.app/', { waitUntil: 'networkidle' });
+              console.log('✅ Page loaded successfully');
+              
+              console.log('⏳ Waiting 2 seconds...');
               await page.waitForTimeout(2000);
+              
+              console.log('🔍 Looking for LEADERBOARD button...');
               const btn = await page.locator('button:has-text("LEADERBOARD")');
+              const isVisible = await btn.isVisible();
+              console.log(`👁️  Button visible: ${isVisible}`);
+              
+              if (!isVisible) {
+                throw new Error('LEADERBOARD button not found!');
+              }
+              
+              console.log('👆 Clicking LEADERBOARD button...');
               await btn.click();
+              console.log('✅ Button clicked successfully');
+              
+              console.log('⏳ Waiting 3 seconds for database operations...');
               await page.waitForTimeout(3000);
+              
+              console.log('📸 Taking screenshot for verification...');
+              await page.screenshot({ path: 'leaderboard.png' });
+              console.log('✅ Screenshot saved');
+              
               await browser.close();
-              console.log('Ping completed');
+              console.log('🎉 Ping completed successfully!');
             } catch (e) {
+              console.error('❌ Error occurred:', e.message);
               console.error(e);
               process.exit(1);
             }
           })();
           SCRIPT
           node ping.cjs
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: leaderboard-screenshot
+          path: leaderboard.png
+          retention-days: 5
